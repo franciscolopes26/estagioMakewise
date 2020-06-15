@@ -18,9 +18,9 @@ import numpy as np
 import argparse
 import imutils
 import time
-import dlib #tem como fazer com openCV !!!!!!!!!!!!!!!!!!!!!!!!!!!
+#import dlib #tem como fazer com openCV !!!!!!!!!!!!!!!!!!!!!!!!!!!
 import cv2
-
+import json
 
 #
 # caffe, tb para tenserflow, ETC
@@ -170,7 +170,7 @@ while True:
 				# construct a dlib rectangle object from the bounding
 				# box coordinates and then start the dlib correlation
 				# tracker
-				tracker = cv2.TrackerBoosting_create() #importantePraCaralho!!!!!!!!!!!
+				tracker = cv2.TrackerMedianFlow_create() #importante!!!!!!!
 				rect = (startX, startY, endX - startX, endY - startY)
 				tracker.init(rgb, rect)
 
@@ -222,7 +222,16 @@ while True:
 	# draw a horizontal line in the center of the frame -- once an
 	# object crosses this line we will determine whether they were
 	# moving 'up' or 'down'
-	cv2.line(frame, (0, H // 2), (W, H // 2), (0, 255, 255), 2)
+
+	#DesenharLinha
+
+	line1 = (W // 2, 0)
+	line2 = (W // 2, H)
+
+	cv2.line(frame, line1, line2, (0, 255, 255), 2)
+# InicialA * FinalB - inicialB *
+
+
 
 	# use the centroid tracker to associate the (1) old object
 	# centroids with (2) the newly computed object centroids
@@ -246,7 +255,7 @@ while True:
 			# us in which direction the object is moving (negative for
 			# 'up' and positive for 'down')
 			y = [c[1] for c in to.centroids]
-			direction = centroid[1] - np.mean(y)
+			direction = centroid[1] - np.mean(x)
 			to.centroids.append(centroid)
 
 			# check to see if the object has been counted or not
@@ -254,16 +263,22 @@ while True:
 				# if the direction is negative (indicating the object
 				# is moving up) AND the centroid is above the center
 				# line, count the object
-				if direction < 0 and centroid[1] < H // 2:
-					totalUp += 1
+				if direction < 0 and centroid[1] < W // 2: #MUDAR O CALCULO
+					totalUp = centroids[-1][1]
 					to.counted = True
 
 				# if the direction is positive (indicating the object
 				# is moving down) AND the centroid is below the
 				# center line, count the object
-				elif direction > 0 and centroid[1] > H // 2:
+				elif direction > 0 and centroid[1] > W // 2: #MUDAR O CALCULO
 					totalDown += 1
 					to.counted = True
+
+
+				#ARQUIVO JSON
+				with open('test.json', 'w') as fileTest:
+					values = {'Cima': totalUp, 'Baixo': totalDown}
+					json.dump(values, fileTest)
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to
