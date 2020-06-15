@@ -258,15 +258,13 @@ while True:
 			direction = centroid[1] - np.mean(x)
 			to.centroids.append(centroid)
 
-
 			# check to see if the object has been counted or not
 			if not to.counted:
 				# if the direction is negative (indicating the object
 				# is moving up) AND the centroid is above the center
 				# line, count the object
 				if direction < 0 and centroid[1] < W // 2: #MUDAR O CALCULO
-					totalUp = to.centroids[-1]
-					totalDown = to.centroids[0]
+					totalUp = centroids[-1][1]
 					to.counted = True
 
 				# if the direction is positive (indicating the object
@@ -278,9 +276,9 @@ while True:
 
 
 				#ARQUIVO JSON
-				#with open('test.json', 'w') as fileTest:
-				#	values = {'Cima': totalUp, 'Baixo': totalDown}
-				#	json.dump(values, fileTest)
+				with open('test.json', 'w') as fileTest:
+					values = {'Cima': totalUp, 'Baixo': totalDown}
+					json.dump(values, fileTest)
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to
