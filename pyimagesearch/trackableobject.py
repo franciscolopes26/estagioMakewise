@@ -1,5 +1,3 @@
-import collections
-import cv2
 
 from pyimagesearch.point import doIntersect, Point
 
@@ -28,8 +26,20 @@ class TrackableObject:
 
 
     def is_on_the_left_of_line(self, point_a, point_b):
-        return False
+        current_point = self.centroids[-1]
 
+
+        v1 = (point_a[0] - point_b[0], point_a[1] - point_b[1])
+        v2 = (point_b[0] - current_point[0], point_b[1] - current_point[1])
+        xp = v1[0] * v2[1] - v1[1] * v2[0]  # Cross product
+        if xp != 0:
+            if xp > 0:
+                return False
+
+            else:
+                return True
+        else:
+            return False
 
 # Small test code
 
@@ -64,7 +74,19 @@ if __name__ == '__main__':
         print("Test fail")
 
     print("Test TrackableObject crossing the line")
-    t.centroids.append((3, 1))
+    t.centroids.append((2, 1))
+    if t.is_crossing_line(a, b) == True:
+        print("Test pass")
+    else:
+        print("Test fail")
+
+    print("Test TrackableObject is_on_the_left_of_line crossing the line")
+    if t.is_on_the_left_of_line(a,b) == True:
+        print("Test pass")
+    else:
+        print("Test fail")
+        print("Test TrackableObject crossing the line")
+        t.centroids.append((3, 1))
     if t.is_crossing_line(a, b) == True:
         print("Test pass")
     else:
@@ -72,6 +94,6 @@ if __name__ == '__main__':
 
     print("Test TrackableObject is_on_the_left_of_line crossing the line")
     if t.is_on_the_left_of_line(a, b) == True:
-        print("Test pass")
+         print("Test pass")
     else:
-        print("Test fail")
+         print("Test fail")
