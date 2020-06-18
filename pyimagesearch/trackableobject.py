@@ -3,12 +3,15 @@ import cv2
 
 from pyimagesearch.point import doIntersect, Point
 
+
 class TrackableObject:
     def __init__(self, objectID, centroid):
         # store the object ID, then initialize a list of centroids
         # using the current centroid
         self.objectID = objectID
         self.centroids = [centroid]
+        self.secure = None
+
 
     def is_crossing_line(self, point_a, point_b):
         # this function will check if the line segment form by connection
@@ -19,15 +22,38 @@ class TrackableObject:
         else:
             current_point = self.centroids[-1]
             prev_point = self.centroids[-2]
-            return doIntersect(
+            if self.secure == None \
+                    and doIntersect(
                 Point(current_point[0], current_point[1]),
                 Point(prev_point[0], prev_point[1]),
                 Point(point_a[0], point_a[1]),
                 Point(point_b[0], point_b[1])
-            )
-
+            ):  # Primeira vez, guarda o ultimo ponto antes da linha
+                self.secure = (prev_point[0], prev_point[1])
+                return False
+            if (self.secure != None) \
+                    and doIntersect(
+                    Point(current_point[0], current_point[1]),
+                    Point(self.secure[0], self.secure[1]),
+                    Point(point_a[0], point_a[1]),
+                    Point(point_b[0], point_b[1])
+                ): #Segunda+ vez, verifica se cruzou do ultimo ponto antes da linha
+                return True
+            return False
 
     def is_on_the_left_of_line(self, point_a, point_b):
+        current_point = self.centroids[-1]
+        teste = ((current_point[0] - point_a[0]) * (point_b[1] - point_a[1]))\
+                - ((current_point[1] - point_a[1]) * (point_b[0] - point_a[0]))
+
+        # condicionar para quem pisar na linha e voltar para trás não contar
+
+        if teste < 0:
+            self.secure = None
+            return True
+        if teste == 0: # em cima da linha e anterior ter cruzado a linha
+            return False
+        self.secure = None
         return False
 
 
