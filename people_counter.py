@@ -44,9 +44,9 @@ ap.add_argument("-i", "--input", type=str,
 	help="path to optional input video file")
 ap.add_argument("-o", "--output", type=str,
 	help="path to optional output video file")
-ap.add_argument("-c", "--confidence", type=float, default=0.4,
+ap.add_argument("-c", "--confidence", type=float, default=0.3,
 	help="minimum probability to filter weak detections")
-ap.add_argument("-s", "--skip-frames", type=int, default=30,
+ap.add_argument("-s", "--skip-frames", type=int, default=14,
 	help="# of skip frames between detections")
 args = vars(ap.parse_args())
 
@@ -90,8 +90,10 @@ trackableObjects = {}
 # initialize the total number of frames processed thus far, along
 # with the total number of objects that have moved either up or down
 totalFrames = 0
-totalDown = 0
-totalUp = 0
+total_right_AB = 0
+total_left_AB = 0
+
+
 
 # start the frames per second throughput estimator
 fps = FPS().start()
@@ -112,6 +114,10 @@ while True:
 	# less data we have, the faster we can process it), then convert
 	# the frame from BGR to RGB for dlib
 	frame = imutils.resize(frame, width=500)
+
+	point_a = (250,200)
+	point_b = (500,200)
+
 	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
 	# if the frame dimensions are empty, set them
@@ -214,8 +220,8 @@ while True:
 
 	# draw a horizontal line in the center of the frame -- once an
 	# object crosses this line we will determine whether they were
-	# moving 'up' or 'down'
-	cv2.line(frame, (0, H // 2), (W, H // 2), (0, 255, 255), 2)
+	# moving to the left or to the right of AB'
+	cv2.line(frame, point_a, point_b, (0, 255, 255), 2)
 
 	# use the centroid tracker to associate the (1) old object
 	# centroids with (2) the newly computed object centroids
@@ -238,25 +244,15 @@ while True:
 			# centroid and the mean of *previous* centroids will tell
 			# us in which direction the object is moving (negative for
 			# 'up' and positive for 'down')
-			y = [c[1] for c in to.centroids]
-			direction = centroid[1] - np.mean(y)
 			to.centroids.append(centroid)
 
-			# check to see if the object has been counted or not
-			if not to.counted:
-				# if the direction is negative (indicating the object
-				# is moving up) AND the centroid is above the center
-				# line, count the object
-				if direction < 0 and centroid[1] < H // 2:
-					totalUp += 1
-					to.counted = True
-
-				# if the direction is positive (indicating the object
-				# is moving down) AND the centroid is below the
-				# center line, count the object
-				elif direction > 0 and centroid[1] > H // 2:
-					totalDown += 1
-					to.counted = True
+			# test if it cross the line 
+			if to.is_crossing_line(point_a,point_b):
+				# test if te final position is on left or the right of the line
+				if to.is_on_the_left_of_line(point_a,point_b):
+					total_left_AB += 1
+				else:
+					total_right_AB +=1
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to
@@ -271,8 +267,8 @@ while True:
 	# construct a tuple of information we will be displaying on the
 	# frame
 	info = [
-		("Up", totalUp),
-		("Down", totalDown),
+		("Left of AB", total_left_AB),
+		("Right of AB", total_right_AB),
 		("Status", status),
 	]
 
