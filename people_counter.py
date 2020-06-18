@@ -18,7 +18,6 @@ import numpy as np
 import argparse
 import imutils
 import time
-import dlib #tem como fazer com openCV !!!!!!!!!!!!!!!!!!!!!!!!!!!
 import cv2
 
 
@@ -170,7 +169,7 @@ while True:
 				# construct a dlib rectangle object from the bounding
 				# box coordinates and then start the dlib correlation
 				# tracker
-				tracker = cv2.TrackerBoosting_create() #importantePraCaralho!!!!!!!!!!!
+				tracker = cv2.TrackerMedianFlow_create() #importantePraCaralho!!!!!!!!!!!
 				rect = (startX, startY, endX - startX, endY - startY)
 				tracker.init(rgb, rect)
 
@@ -188,12 +187,6 @@ while True:
 			status = "Tracking"
 
 			# update the tracker and grab the updated position
-
-			# ---
-			# tracker.update(rgb)
-			# pos = tracker.get_position()
-			# ---
-
 			retval, boundingBox = tracker.update(rgb)
 
 
