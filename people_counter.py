@@ -115,8 +115,8 @@ while True:
 	# the frame from BGR to RGB for dlib
 	frame = imutils.resize(frame, width=500)
 
-	point_a = (250,200)
-	point_b = (500,200)
+	point_a = (250,0)
+	point_b = (250,500)
 
 	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -132,7 +132,7 @@ while True:
 			(W, H), True)
 
 	# initialize the current status along with our list of bounding
-	# box rectangles returned by either (1) our object detector or
+	# box rectangles returned by either (1) our object detector
 	# (2) the correlation trackers
 	status = "Waiting"
 	rects = []
@@ -249,10 +249,11 @@ while True:
 			# test if it cross the line 
 			if to.is_crossing_line(point_a,point_b):
 				# test if te final position is on left or the right of the line
-				if to.is_on_the_left_of_line(point_a,point_b):
+				if to.is_on_the_left_of_line(point_a,point_b)==2:
 					total_left_AB += 1
-				else:
+				elif to.is_on_the_left_of_line(point_a,point_b)==1:
 					total_right_AB +=1
+
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to

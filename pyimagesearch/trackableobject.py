@@ -34,12 +34,12 @@ class TrackableObject:
         xp = v1[0] * v2[1] - v1[1] * v2[0]  # Cross product
         if xp != 0:
             if xp > 0:
-                return False
+                return 1#direita
 
             else:
-                return True
+                return 2 #esquerda
         else:
-            return False
+            return 3 #centro
 
 # Small test code
 
