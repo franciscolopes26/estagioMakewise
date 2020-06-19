@@ -53,7 +53,7 @@ class TrackableObject:
             teste_b = ((prev_point[0] - point_a[0]) * (point_b[1] - point_a[1])) \
                     - ((prev_point[1] - point_a[1]) * (point_b[0] - point_a[0]))
 
-        if (teste_a != 0 and teste_b == 0) or (teste_a * teste_b < 0): # Estão em lados opostos e são posições validas
+        if (teste_a != 0 and teste_b == 0) or (teste_a * teste_b < 0): # Estão em lados opostos
             self.secure = None
             if teste_a < 0:
                 return 1 # lado a
@@ -66,6 +66,8 @@ class TrackableObject:
 if __name__ == '__main__':
 
     t = TrackableObject('1', (1, 1))
+
+    #Linha
     a = (2, 0)
     b = (2, 2)
 

@@ -20,19 +20,8 @@ import imutils
 import time
 import cv2
 
-
-#
-# caffe, tb para tenserflow, ETC
-# openCV consegue converter a maioria
-# layers = blocos construtores
-
-# problema = layers apenas de caffe(exemplo) que não existam em tf
-# python people_counter.py -p F:\people-counting-opencv\mobilenet_ssd\MobileNetSSD_deploy.prototxt -m F:\people-counting-opencv\mobilenet_ssd\MobileNetSSD_deploy.caffemodel -i F:\people-counting-opencv\videos\example_01.mp4 -o F:\people-counting-opencv\output\output_03.avi
-
-
-
-# DESAFIO: SUBSTITUIR TRACKER DO DLIB POR OPENCV
-
+#python3 people_counter.py -p /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.prototxt -m /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.caffemodel -i /home/guilherme/projetos/estagioMakewise/videos/example_01.mp4 -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
+# python3 people_counter.py -p /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.prototxt -m /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.caffemodel -i "rtsp://10.1.203.252:554/user=admin&password=&channel=1&stream=0.sdp" -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -115,8 +104,8 @@ while True:
 	# the frame from BGR to RGB for dlib
 	frame = imutils.resize(frame, width=500)
 
-	point_a = (0,200)
-	point_b = (500,200)
+	point_a = (250,00)
+	point_b = (250,500)
 
 
 	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
