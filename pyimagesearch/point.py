@@ -40,14 +40,14 @@ def orientation(p, q, r):
 
 
 # The main function that returns true if
-# the line segment 'p1q1' and 'p2q2' intersect.
-def doIntersect(p1, q1, p2, q2):
+# the line segment 'prev_centroid-current_centroid' and 'point_a-point_b' intersect.
+def doIntersect(prev_centroid, current_centroid, point_a, point_b):
     # Find the 4 orientations required for
     # the general and special cases
-    o1 = orientation(p1, q1, p2)
-    o2 = orientation(p1, q1, q2)
-    o3 = orientation(p2, q2, p1)
-    o4 = orientation(p2, q2, q1)
+    o1 = orientation(prev_centroid, current_centroid, point_a)
+    o2 = orientation(prev_centroid, current_centroid, point_b)
+    o3 = orientation(point_a, point_b, prev_centroid)
+    o4 = orientation(point_a, point_b, current_centroid)
 
     # General case
     if ((o1 != o2) and (o3 != o4)):
@@ -55,20 +55,20 @@ def doIntersect(p1, q1, p2, q2):
 
     # Special Cases
 
-    # p1 , q1 and p2 are colinear and p2 lies on segment p1q1
-    if ((o1 == 0) and onSegment(p1, p2, q1)):
+    # prev_centroid , current_centroid and point_a are colinear and point_a lies on segment prev_centroid-current_centroid
+    if ((o1 == 0) and onSegment(prev_centroid, point_a, current_centroid)):
         return True
 
-    # p1 , q1 and q2 are colinear and q2 lies on segment p1q1
-    if ((o2 == 0) and onSegment(p1, q2, q1)):
+    # prev_centroid , current_centroid and point_b are colinear and point_b lies on segment prev_centroid-current_centroid
+    if ((o2 == 0) and onSegment(prev_centroid, point_b, current_centroid)):
         return True
 
-    # p2 , q2 and p1 are colinear and p1 lies on segment p2q2
-    if ((o3 == 0) and onSegment(p2, p1, q2)):
+    # point_a , point_b and prev_centroid are colinear and prev_centroid lies on segment point_apoint_b
+    if ((o3 == 0) and onSegment(point_a, prev_centroid, point_b)):
         return True
 
-    # p2 , q2 and q1 are colinear and q1 lies on segment p2q2
-    if ((o4 == 0) and onSegment(p2, q1, q2)):
+    # point_a , point_b and current_centroid are colinear and current_centroid lies on segment point_apoint_b
+    if ((o4 == 0) and onSegment(point_a, current_centroid, point_b)):
         return True
 
     # If none of the cases

@@ -244,7 +244,7 @@ while True:
 			# centroid and the mean of *previous* centroids will tell
 			# us in which direction the object is moving (negative for
 			# 'up' and positive for 'down')
-			to.centroids.append(centroid)
+			to.update_position(centroid)
 
 			# test if it cross the line 
 			if to.is_crossing_line(point_a,point_b):
