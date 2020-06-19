@@ -19,7 +19,7 @@ import argparse
 import imutils
 import time
 import cv2
-
+import requests
 
 #
 # caffe, tb para tenserflow, ETC
@@ -249,10 +249,16 @@ while True:
 			# test if it cross the line 
 			if to.is_crossing_line(point_a,point_b):
 				# test if te final position is on left or the right of the line
+
 				if to.last_side == 'L':
 					total_left_AB += 1
+					myobj = {'enter': 1, "exit": 0}
 				elif to.last_side == 'R':
 					total_right_AB +=1
+					myobj = {'enter': 0, "exit": 1}
+
+				url = 'http://127.0.0.1:5000/form/sensor1'
+				requests.post(url, data=myobj)
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to
