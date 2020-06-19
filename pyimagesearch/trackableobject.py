@@ -53,14 +53,11 @@ class TrackableObject:
             teste_b = ((prev_point[0] - point_a[0]) * (point_b[1] - point_a[1])) \
                     - ((prev_point[1] - point_a[1]) * (point_b[0] - point_a[0]))
 
-        if (teste_a * teste_b) <= 0: # Estão em lados opostos
-
+        if (teste_a != 0 and teste_b == 0) or (teste_a * teste_b < 0): # Estão em lados opostos e são posições validas
+            self.secure = None
             if teste_a < 0:
-                self.secure = None
-                return 1
-            else:
-                self.secure = None
-                return 2
+                return 1 # lado a
+            return 2 # lado b
         return 0 #em cima da linha e anterior ter cruzado a linha
 
 
