@@ -115,8 +115,8 @@ while True:
 	# the frame from BGR to RGB for dlib
 	frame = imutils.resize(frame, width=500)
 
-	point_a = (250,200)
-	point_b = (500,200)
+	point_a = (250,0)
+	point_b = (250,500)
 
 	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 

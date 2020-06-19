@@ -16,7 +16,7 @@ class TrackableObject:
     def update_position(self, new_position):
         if new_position[0] == self.centroids[-1][0] and new_position[1] == self.centroids[-1][1]:
             # in the same place nothing change
-            return False
+            return
         else:
             self.centroids.append(new_position)
 
@@ -35,7 +35,7 @@ class TrackableObject:
 
         point_a = Point(point_a[0], point_a[1])
         point_b = Point(point_b[0], point_b[1])
-        oriten =  orientation(point_a, point_b,current_point)
+        oriten = orientation(point_a, point_b,current_point)
         if oriten == 0:
             return False
         elif oriten == 1:
@@ -55,7 +55,7 @@ class TrackableObject:
                    )
 
         self.last_side = new_side
-        return False;
+        return False
 
 
 
