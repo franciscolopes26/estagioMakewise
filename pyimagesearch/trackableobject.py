@@ -43,18 +43,25 @@ class TrackableObject:
 
     def is_on_the_left_of_line(self, point_a, point_b):
         current_point = self.centroids[-1]
-        teste = ((current_point[0] - point_a[0]) * (point_b[1] - point_a[1]))\
+        prev_point = self.secure
+
+        teste_a = ((current_point[0] - point_a[0]) * (point_b[1] - point_a[1])) \
                 - ((current_point[1] - point_a[1]) * (point_b[0] - point_a[0]))
 
-        # condicionar para quem pisar na linha e voltar para trás não contar
+        teste_b = 0
+        if prev_point != None:
+            teste_b = ((prev_point[0] - point_a[0]) * (point_b[1] - point_a[1])) \
+                    - ((prev_point[1] - point_a[1]) * (point_b[0] - point_a[0]))
 
-        if teste < 0:
-            self.secure = None
-            return True
-        if teste == 0: # em cima da linha e anterior ter cruzado a linha
-            return False
-        self.secure = None
-        return False
+        if (teste_a * teste_b) <= 0: # Estão em lados opostos
+
+            if teste_a < 0:
+                self.secure = None
+                return 1
+            else:
+                self.secure = None
+                return 2
+        return 0 #em cima da linha e anterior ter cruzado a linha
 
 
 # Small test code

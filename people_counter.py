@@ -250,10 +250,10 @@ while True:
 			# test if it cross the line 
 			if to.is_crossing_line(point_a,point_b):
 				# test if te final position is on left or the right of the line
-				if to.is_on_the_left_of_line(point_a,point_b):
+				if to.is_on_the_left_of_line(point_a, point_b) == 1:
+					total_right_AB += 1
+				elif to.is_on_the_left_of_line(point_a, point_b) == 2:
 					total_left_AB += 1
-				else:
-					total_right_AB +=1
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to
