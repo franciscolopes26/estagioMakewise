@@ -132,7 +132,7 @@ while True:
 			(W, H), True)
 
 	# initialize the current status along with our list of bounding
-	# box rectangles returned by either (1) our object detector or
+	# box rectangles returned by either (1) our object detector
 	# (2) the correlation trackers
 	status = "Waiting"
 	rects = []
