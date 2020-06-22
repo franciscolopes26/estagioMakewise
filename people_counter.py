@@ -100,6 +100,8 @@ try:
 		total_left_AB = values["enter"]
 except FileNotFoundError:
 	with open('output.json', 'w') as JSON:
+		total_right_AB = 0
+		total_left_AB = 0
 		json.dump({}, JSON)
 
 
