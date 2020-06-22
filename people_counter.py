@@ -94,15 +94,19 @@ trackableObjects = {}
 totalFrames = 0
 
 try:
-	with open('output.json', 'r') as JSON:
-		values = json.load(JSON)
-		total_right_AB = values["exit"]
-		total_left_AB = values["enter"]
+	try:
+		with open('output.json', 'r') as JSON:
+			values = json.load(JSON)
+			total_right_AB = values["exit"]
+			total_left_AB = values["enter"]
+	except KeyError:
+		total_right_AB = 0
+		total_left_AB = 0
 except FileNotFoundError:
 	with open('output.json', 'w') as JSON:
 		total_right_AB = 0
 		total_left_AB = 0
-		json.dump({}, JSON)
+		json.dump({'enter': 0, "exit": 0}, JSON)
 
 
 # total_right_AB = 0
