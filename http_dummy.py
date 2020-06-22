@@ -6,8 +6,29 @@ from flask import json
 http_dummy_server = Flask(__name__) #create the Flask app
 
 # Global variables to store info
-TOTAL_ENTER = 0
+
 TOTAL_EXIT = 0
+TOTAL_ENTER = 0
+
+
+
+
+
+
+try:
+	try:
+		with open('output.json', 'r') as JSON:
+			values = json.load(JSON)
+			TOTAL_EXIT = values["exit"]
+			TOTAL_ENTER = values["enter"]
+	except KeyError:
+		TOTAL_EXIT = 0
+		TOTAL_ENTER = 0
+except FileNotFoundError:
+	with open('output.json', 'w') as JSON:
+		TOTAL_EXIT = 0
+		TOTAL_ENTER = 0
+		json.dump({'enter': 0, "exit": 0}, JSON)
 
 
 # Recives post in json with countings
