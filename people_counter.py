@@ -20,6 +20,8 @@ import imutils
 import time
 import cv2
 import requests
+import json
+
 
 #
 # caffe, tb para tenserflow, ETC
@@ -259,6 +261,11 @@ while True:
 
 				url = 'http://127.0.0.1:5000/form/sensor1'
 				requests.post(url, data=myobj)
+
+				with open('output.json', 'w') as JSON:
+					values = {'enter': total_left_AB, "exit": total_right_AB}
+					json.dump(values, JSON)
+
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to
