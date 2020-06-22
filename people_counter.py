@@ -92,8 +92,15 @@ trackableObjects = {}
 # initialize the total number of frames processed thus far, along
 # with the total number of objects that have moved either up or down
 totalFrames = 0
-total_right_AB = 0
-total_left_AB = 0
+
+
+with open('output.json', 'r') as INPUT:
+	values = json.load(INPUT)
+	total_right_AB = values["exit"]
+	total_left_AB = values["enter"]
+
+# total_right_AB = 0
+# total_left_AB = 0
 
 
 
