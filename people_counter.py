@@ -93,11 +93,15 @@ trackableObjects = {}
 # with the total number of objects that have moved either up or down
 totalFrames = 0
 
+try:
+	with open('output.json', 'r') as JSON:
+		values = json.load(JSON)
+		total_right_AB = values["exit"]
+		total_left_AB = values["enter"]
+except FileNotFoundError:
+	with open('output.json', 'w') as JSON:
+		json.dump({}, JSON)
 
-with open('output.json', 'r') as INPUT:
-	values = json.load(INPUT)
-	total_right_AB = values["exit"]
-	total_left_AB = values["enter"]
 
 # total_right_AB = 0
 # total_left_AB = 0
