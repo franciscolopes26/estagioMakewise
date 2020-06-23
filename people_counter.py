@@ -20,8 +20,6 @@ import imutils
 import time
 import cv2
 import requests
-import json
-
 
 #
 # caffe, tb para tenserflow, ETC
