@@ -1,11 +1,15 @@
 
-from flask import Flask, request #import main Flask class and request object
-from flask import json
+
+from flask import Flask, request,json #import main Flask class and request object
 
 
-http_dummy_server = Flask(__name__) #create the Flask app
+
+http_dummy_server = Flask(__name__, static_url_path="") #create the Flask app
 
 # Global variables to store info
+
+
+TOTAL_EXIT = 0
 TOTAL_ENTER = 0
 TOTAL_EXIT = 0
 
@@ -46,7 +50,7 @@ def counting_post(sensor_id):
 
 
 # Return current counting
-@http_dummy_server.route('/', methods=['GET'])
+@http_dummy_server.route('/counting', methods=['GET'])
 def countings():
     global TOTAL_ENTER
     global TOTAL_EXIT
@@ -58,6 +62,10 @@ def countings():
         mimetype='application/json'
     )
     return response
+
+@http_dummy_server.route('/')
+def root():
+    return http_dummy_server.send_static_file("/teste_site/Index.html")
 
 
 @http_dummy_server.route('/reset', methods=['POST'])
