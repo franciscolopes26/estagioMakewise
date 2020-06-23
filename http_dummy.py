@@ -60,6 +60,21 @@ def countings():
     return response
 
 
+@http_dummy_server.route('/reset', methods=['POST'])
+    global TOTAL_ENTER
+def reset():
+    global TOTAL_EXIT
+    TOTAL_EXIT = 0
+    TOTAL_ENTER = 0
+    response = http_dummy_server.response_class(
+    data = {'msg': 'RESET has been executed'}
+        status=200,
+        response=json.dumps(data),
+        mimetype='application/json'
+    )
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
 
 if __name__ == '__main__':
     http_dummy_server.run(debug=True, port=5000) #run app in debug mode on port 5000
