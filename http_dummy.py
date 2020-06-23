@@ -10,21 +10,12 @@ http_dummy_server = Flask(__name__) #create the Flask app
 TOTAL_EXIT = 0
 TOTAL_ENTER = 0
 
-
-
-
-
-
 try:
-	try:
-		with open('output.json', 'r') as JSON:
-			values = json.load(JSON)
-			TOTAL_EXIT = values["exit"]
-			TOTAL_ENTER = values["enter"]
-	except KeyError:
-		TOTAL_EXIT = 0
-		TOTAL_ENTER = 0
-except FileNotFoundError:
+	with open('output.json', 'r') as JSON:
+		values = json.load(JSON)
+		TOTAL_EXIT = values["exit"]
+		TOTAL_ENTER = values["enter"]
+except FileNotFoundError or KeyError:
 	with open('output.json', 'w') as JSON:
 		TOTAL_EXIT = 0
 		TOTAL_ENTER = 0
@@ -78,6 +69,10 @@ def countings():
         status=200,
         mimetype='application/json'
     )
+
+    with open('output.json', 'w') as JSON:
+        json.dump({'enter': TOTAL_ENTER, "exit": TOTAL_EXIT}, JSON)
+
     return response
 
 

@@ -92,22 +92,8 @@ trackableObjects = {}
 # initialize the total number of frames processed thus far, along
 # with the total number of objects that have moved either up or down
 totalFrames = 0
-
-try:
-	try:
-		with open('output.json', 'r') as JSON:
-			values = json.load(JSON)
-			total_right_AB = values["exit"]
-			total_left_AB = values["enter"]
-	except KeyError:
-		total_right_AB = 0
-		total_left_AB = 0
-except FileNotFoundError:
-	with open('output.json', 'w') as JSON:
-		total_right_AB = 0
-		total_left_AB = 0
-		json.dump({'enter': 0, "exit": 0}, JSON)
-
+total_right_AB = 0
+total_left_AB = 0
 
 # total_right_AB = 0
 # total_left_AB = 0
@@ -278,11 +264,6 @@ while True:
 
 				url = 'http://127.0.0.1:5000/form/sensor1'
 				requests.post(url, data=myobj)
-
-				with open('output.json', 'w') as JSON:
-					values = {'enter': total_left_AB, "exit": total_right_AB}
-					json.dump(values, JSON)
-
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to
