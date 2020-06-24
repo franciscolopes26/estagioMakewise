@@ -4,14 +4,13 @@ from flask import Flask, request,json #import main Flask class and request objec
 
 
 
-http_dummy_server = Flask(__name__, static_url_path="") #create the Flask app
+http_dummy_server = Flask(__name__, static_url_path="",static_folder="./webapp",) #create the Flask app
 
 # Global variables to store info
 
 
 TOTAL_EXIT = 0
 TOTAL_ENTER = 0
-TOTAL_EXIT = 0
 
 
 # Recives post in json with countings
@@ -65,17 +64,17 @@ def countings():
 
 @http_dummy_server.route('/')
 def root():
-    return http_dummy_server.send_static_file("/teste_site/Index.html")
+    return http_dummy_server.send_static_file("index.html")
 
 
 @http_dummy_server.route('/reset', methods=['POST'])
-    global TOTAL_ENTER
 def reset():
+    global TOTAL_ENTER
     global TOTAL_EXIT
     TOTAL_EXIT = 0
     TOTAL_ENTER = 0
-    response = http_dummy_server.response_class(
     data = {'msg': 'RESET has been executed'}
+    response = http_dummy_server.response_class(
         status=200,
         response=json.dumps(data),
         mimetype='application/json'
