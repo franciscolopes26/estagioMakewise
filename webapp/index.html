@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Counter</title>
+    <link rel="stylesheet" href="/css/bootstrap-4.5.0.min.css">
+
+    <script src="/js/jquery-3.5.1.min.js"></script>
+    <script src="/js/bootstrap-4.5.0.min.js"></script>
+
+    <script src="/js/axios-0.19.2.min.js"></script>
+    <script src="/js/vue-2.6.11.js"></script>
+
+</head>
+<body style="height: 100%">
+<div id="app"></div>
+
+<script>
+       new Vue({
+          el:'#app',
+          template:`
+            <div class="conteiner" style="height: 100%" >
+              <div  style="background-image:url('fundo.jpg');height:100%; background-position: center; background-size:cover; position:fixed; width:100%" >
+              </div>
+              <div style="top: 50%; left: 50%; transform: translate(-50%,-50%); position: absolute">
+                <h1 style="font-size: 32px !important; position: relative; color:white">Entrada: {{ totalA }} <br> Saida: {{ totalB }} <br> Dentroloja: {{ total }} </h1>
+                <hr class="w3-border-grey" style="margin:auto;width:100%">
+                <button  type="submit" @click="submitProduct" class="btn btn-dark">Reset</button>
+               </div>
+            </div>`,
+          data: {
+             totalA:0,
+             totalB:0,
+             total:0
+          },
+          methods: {
+             getDados:function(){
+           
+               var self = this;
+               axios.get('/counting')
+               .then((response) => {
+                  console.log(response);
+                  self.totalA = response.data["total"]["enter"]
+                  self.totalB = response.data["total"]["exit"]
+                  self.total = response.data["total"]["dentro"]
+               }, (error) => {
+                console.log(error);
+               });
+             },
+             //BOTAO POST
+             submitProduct: function () {
+               var self = this;
+               axios.post('/reset',)
+               .then((response) => {
+               self.getDados();
+               }, (error) => {
+               console.log(error);
+               });
+            }
+
+           
+               
+               // assuming your response payload is in a data objec
+
+            },
+            mounted: function () {
+               setInterval(this.getDados, 1000);
+               
+          }   
+            
+      })     
+
+</script>
+
+</body>
+</html>

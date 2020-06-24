@@ -1,5 +1,3 @@
-import collections
-import cv2
 
 from pyimagesearch.point import doIntersect, Point, onSegment, orientation
 

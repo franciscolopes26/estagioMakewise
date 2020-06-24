@@ -4,6 +4,7 @@
 #	--model mobilenet_ssd/MobileNetSSD_deploy.caffemodel --input videos/example_01.mp4 \
 #	--output output/output_01.avi
 #
+
 # To read from webcam and write back out to disk:
 # python people_counter.py --prototxt mobilenet_ssd/MobileNetSSD_deploy.prototxt \
 #	--model mobilenet_ssd/MobileNetSSD_deploy.caffemodel \
@@ -26,9 +27,8 @@ import requests
 # openCV consegue converter a maioria
 # layers = blocos construtores
 
-# problema = layers apenas de caffe(exemplo) que não existam em tf
-# python people_counter.py -p F:\people-counting-opencv\mobilenet_ssd\MobileNetSSD_deploy.prototxt -m F:\people-counting-opencv\mobilenet_ssd\MobileNetSSD_deploy.caffemodel -i F:\people-counting-opencv\videos\example_01.mp4 -o F:\people-counting-opencv\output\output_03.avi
 
+#python3 people_counter.py -p /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.prototxt -m /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.caffemodel -i 'rtsp://10.1.203.252:554/user=admin&password=&channel=1&stream=0.sdp' -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
 
 
 # DESAFIO: SUBSTITUIR TRACKER DO DLIB POR OPENCV
@@ -48,6 +48,8 @@ ap.add_argument("-c", "--confidence", type=float, default=0.3,
 	help="minimum probability to filter weak detections")
 ap.add_argument("-s", "--skip-frames", type=int, default=14,
 	help="# of skip frames between detections")
+ap.add_argument("-u", "--url", type=str, default='http://127.0.0.1:5000/form/sensor1',
+	help="server location, localhost:5000 by default")
 args = vars(ap.parse_args())
 
 # initialize the list of class labels MobileNet SSD was trained to
@@ -59,7 +61,7 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
 
 # load our serialized model from disk
 print("[INFO] loading model...")
-net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"]) #importantePraCaralho!!!!!!!!!
+net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
 
 # if a video path was not supplied, grab a reference to the webcam
 if not args.get("input", False):
@@ -93,6 +95,9 @@ totalFrames = 0
 total_right_AB = 0
 total_left_AB = 0
 
+# total_right_AB = 0
+# total_left_AB = 0
+
 
 
 # start the frames per second throughput estimator
@@ -115,8 +120,9 @@ while True:
 	# the frame from BGR to RGB for dlib
 	frame = imutils.resize(frame, width=500)
 
-	point_a = (250,0)
-	point_b = (250,500)
+	#linha #line
+	point_a = (0,200)
+	point_b = (500,200)
 
 	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -132,7 +138,7 @@ while True:
 			(W, H), True)
 
 	# initialize the current status along with our list of bounding
-	# box rectangles returned by either (1) our object detector or
+	# box rectangles returned by either (1) our object detector
 	# (2) the correlation trackers
 	status = "Waiting"
 	rects = []
@@ -175,7 +181,7 @@ while True:
 				# construct a dlib rectangle object from the bounding
 				# box coordinates and then start the dlib correlation
 				# tracker
-				tracker = cv2.TrackerMedianFlow_create() #importantePraCaralho!!!!!!!!!!!
+				tracker = cv2.TrackerMedianFlow_create()
 				rect = (startX, startY, endX - startX, endY - startY)
 				tracker.init(rgb, rect)
 
@@ -257,7 +263,7 @@ while True:
 					total_right_AB +=1
 					myobj = {'enter': 0, "exit": 1}
 
-				url = 'http://127.0.0.1:5000/form/sensor1'
+				url = args["url"]
 				requests.post(url, data=myobj)
 
 		# store the trackable object in our dictionary
