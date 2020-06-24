@@ -64,5 +64,3 @@ if __name__ == '__main__':
     t = TrackableObject('1', (1, 1))
     a = (2, 0)
     b = (2, 2)
-
-´

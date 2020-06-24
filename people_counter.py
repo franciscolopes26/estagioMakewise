@@ -48,6 +48,8 @@ ap.add_argument("-c", "--confidence", type=float, default=0.3,
 	help="minimum probability to filter weak detections")
 ap.add_argument("-s", "--skip-frames", type=int, default=14,
 	help="# of skip frames between detections")
+ap.add_argument("-u", "--url", type=str, default='http://127.0.0.1:5000/form/sensor1',
+	help="server location, localhost:5000 by default")
 args = vars(ap.parse_args())
 
 # initialize the list of class labels MobileNet SSD was trained to
@@ -118,8 +120,9 @@ while True:
 	# the frame from BGR to RGB for dlib
 	frame = imutils.resize(frame, width=500)
 
-	point_a = (250,0)
-	point_b = (250,500)
+	#linha #line
+	point_a = (0,200)
+	point_b = (500,200)
 
 	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -260,7 +263,7 @@ while True:
 					total_right_AB +=1
 					myobj = {'enter': 0, "exit": 1}
 
-				url = 'http://127.0.0.1:5000/form/sensor1'
+				url = args["url"]
 				requests.post(url, data=myobj)
 
 		# store the trackable object in our dictionary
