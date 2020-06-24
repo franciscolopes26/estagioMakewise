@@ -8,9 +8,19 @@ http_dummy_server = Flask(__name__, static_url_path="",static_folder="./webapp",
 
 # Global variables to store info
 
-
 TOTAL_EXIT = 0
 TOTAL_ENTER = 0
+
+try:
+	with open('output.json', 'r') as JSON:
+		values = json.load(JSON)
+		TOTAL_EXIT = values["exit"]
+		TOTAL_ENTER = values["enter"]
+except FileNotFoundError or KeyError:
+	with open('output.json', 'w') as JSON:
+		TOTAL_EXIT = 0
+		TOTAL_ENTER = 0
+		json.dump({'enter': 0, "exit": 0}, JSON)
 
 
 # Recives post in json with countings
@@ -60,6 +70,10 @@ def countings():
         status=200,
         mimetype='application/json'
     )
+
+    with open('output.json', 'w') as JSON:
+        json.dump({'enter': TOTAL_ENTER, "exit": TOTAL_EXIT}, JSON)
+
     return response
 
 @http_dummy_server.route('/')

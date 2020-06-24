@@ -93,6 +93,9 @@ totalFrames = 0
 total_right_AB = 0
 total_left_AB = 0
 
+# total_right_AB = 0
+# total_left_AB = 0
+
 
 
 # start the frames per second throughput estimator
