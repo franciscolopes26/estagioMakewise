@@ -13,6 +13,7 @@ TOTAL_EXIT = 0
 TOTAL_ENTER = 0
 
 
+
 # Recives post in json with countings
 # format o json:
 #  {"enter":"1","exit":"2"}
@@ -53,7 +54,8 @@ def counting_post(sensor_id):
 def countings():
     global TOTAL_ENTER
     global TOTAL_EXIT
-    data = { 'total' : { 'enter':TOTAL_ENTER, 'exit':TOTAL_EXIT }}
+
+    data = {'total': {'enter': TOTAL_ENTER, 'exit': TOTAL_EXIT, 'dentro': TOTAL_ENTER-TOTAL_EXIT}}
     print("Current %s" % (data))
     response = http_dummy_server.response_class(
         response=json.dumps(data),
@@ -71,8 +73,10 @@ def root():
 def reset():
     global TOTAL_ENTER
     global TOTAL_EXIT
+
     TOTAL_EXIT = 0
     TOTAL_ENTER = 0
+
     data = {'msg': 'RESET has been executed'}
     response = http_dummy_server.response_class(
         status=200,

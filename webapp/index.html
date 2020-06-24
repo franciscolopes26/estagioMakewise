@@ -23,14 +23,15 @@
               <div  style="background-image:url('fundo.jpg');height:100%; background-position: center; background-size:cover; position:fixed; width:100%" >
               </div>
               <div style="top: 50%; left: 50%; transform: translate(-50%,-50%); position: absolute">
-                <h1 style="font-size: 32px !important; position: relative; color:white">Entrada: {{ totalA }} <br> Saida: {{ totalB }} </h1>
+                <h1 style="font-size: 32px !important; position: relative; color:white">Entrada: {{ totalA }} <br> Saida: {{ totalB }} <br> Dentroloja: {{ total }} </h1>
                 <hr class="w3-border-grey" style="margin:auto;width:100%">
                 <button  type="submit" @click="submitProduct" class="btn btn-dark">Reset</button>
                </div>
             </div>`,
           data: {
              totalA:0,
-             totalB:0
+             totalB:0,
+             total:0
           },
           methods: {
              getDados:function(){
@@ -41,6 +42,7 @@
                   console.log(response);
                   self.totalA = response.data["total"]["enter"]
                   self.totalB = response.data["total"]["exit"]
+                  self.total = response.data["total"]["dentro"]
                }, (error) => {
                 console.log(error);
                });
