@@ -31,7 +31,8 @@
           data: {
              totalA:0,
              totalB:0,
-             total:0
+             total:0,
+             max_people:0
           },
           methods: {
              getDados:function(){
@@ -56,15 +57,26 @@
                }, (error) => {
                console.log(error);
                });
-            }
-
+            },
+               getmaxx:function(){
+                var self = this;
+                axios.get('/getpeoplemax')
+                .then((response) => {
+                  console.log(response);
+                  self.max_people = response.data["maxx"]
+                  console.log(response)
+                 }, (error) => {
+                     console.log(error);
+                  });
+               },
            
                
                // assuming your response payload is in a data objec
 
             },
             mounted: function () {
-               setInterval(this.getDados, 1000);
+               setInterval(this.getmaxx, 1000);
+
                
           }   
             

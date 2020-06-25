@@ -1,33 +1,31 @@
 from json.decoder import JSONDecodeError
 
-from flask import Flask, request,json #import main Flask class and request object
+from flask import Flask, request, json  # import main Flask class and request object
 
-
-
-http_dummy_server = Flask(__name__, static_url_path="",static_folder="./webapp",) #create the Flask app
+http_dummy_server = Flask(__name__, static_url_path="", static_folder="./webapp", )  # create the Flask app
 
 # Global variables to store info
 
 TOTAL_EXIT = 0
 TOTAL_ENTER = 0
-Max_people = 0
+MAX_PEOPLE = 0
 
 try:
-	with open('output.json', 'r') as JSON:
-		values = json.load(JSON)
-		TOTAL_EXIT = values["exit"]
-		TOTAL_ENTER = values["enter"]
+    with open('output.json', 'r') as JSON:
+        values = json.load(JSON)
+        TOTAL_EXIT = values["exit"]
+        TOTAL_ENTER = values["enter"]
 except:
-	with open('output.json', 'w') as JSON:
-		TOTAL_EXIT = 0
-		TOTAL_ENTER = 0
-		json.dump({'enter': 0, "exit": 0}, JSON)
+    with open('output.json', 'w') as JSON:
+        TOTAL_EXIT = 0
+        TOTAL_ENTER = 0
+        json.dump({'enter': 0, "exit": 0}, JSON)
 
 try:
     with open('config.json', 'r') as JSON:
         values = json.load(JSON)
         MAX_PEOPLE = values["maxx"]
-except :
+except:
     with open('config.json', 'w') as JSON:
         MAX_PEOPLE = 25
         json.dump({'maxx': 25}, JSON)
@@ -45,12 +43,13 @@ def counting_json(sensor_id):
     global TOTAL_EXIT
     req_data = request.get_json()
     if req_data:
-        if(req_data['enter']):
+        if (req_data['enter']):
             TOTAL_ENTER += int(req_data['enter'])
         if (req_data['exit']):
             TOTAL_EXIT += int(req_data['exit'])
-    print("Revice counting from sensor %s = %s" % (sensor_id,req_data))
+    print("Revice counting from sensor %s = %s" % (sensor_id, req_data))
     return countings()
+
 
 # Recives post
 #
@@ -64,7 +63,7 @@ def counting_post(sensor_id):
             TOTAL_ENTER += int(req_data['enter'])
         if (req_data['exit']):
             TOTAL_EXIT += int(req_data['exit'])
-    print("Revice counting from sensor %s = %s" % (sensor_id,(req_data['enter'],req_data['exit'])))
+    print("Revice counting from sensor %s = %s" % (sensor_id, (req_data['enter'], req_data['exit'])))
     return countings()
 
 
@@ -74,7 +73,7 @@ def countings():
     global TOTAL_ENTER
     global TOTAL_EXIT
 
-    data = {'total': {'enter': TOTAL_ENTER, 'exit': TOTAL_EXIT, 'dentro': TOTAL_ENTER-TOTAL_EXIT}}
+    data = {'total': {'enter': TOTAL_ENTER, 'exit': TOTAL_EXIT, 'dentro': TOTAL_ENTER - TOTAL_EXIT}}
     print("Current %s" % (data))
     response = http_dummy_server.response_class(
         response=json.dumps(data),
@@ -86,6 +85,7 @@ def countings():
         json.dump({'enter': TOTAL_ENTER, "exit": TOTAL_EXIT}, JSON)
 
     return response
+
 
 @http_dummy_server.route('/')
 def root():
@@ -109,24 +109,22 @@ def reset():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+
 @http_dummy_server.route('/getpeoplemax', methods=['GET'])
 def people_max():
-    global Max_people
-    data = {'MAX': {'maxx': Max_people}}
+    global MAX_PEOPLE
+    data = {'MAX': {'maxx': MAX_PEOPLE}}
     print("pessoas_maximo %s" % (data))
     response = http_dummy_server.response_class(
         response=json.dumps(data),
         status=200,
         mimetype='application/json'
     )
-    #with open('config.json', 'w') as JSON:
-     #   json.dump({'maxx': Max_people}, JSON)
+    # with open('config.json', 'w') as JSON:
+    #   json.dump({'maxx': MAX_PEOPLE}, JSON)
 
     return response
 
 
-
-
 if __name__ == '__main__':
-    http_dummy_server.run(debug=True, port=5000) #run app in debug mode on port 5000
-
+    http_dummy_server.run(debug=True, port=5000)  # run app in debug mode on port 5000
