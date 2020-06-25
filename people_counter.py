@@ -88,6 +88,8 @@ trackableObjects = {}
 totalFrames = 0
 total_right_AB = 0
 total_left_AB = 0
+last_total_left = 0
+last_total_right = 0
 
 # total_right_AB = 0
 # total_left_AB = 0
@@ -190,20 +192,10 @@ while True:
             (x, y, w, h) = [int(v) for v in boundingBox]
 
             # unpack the position object
-
-            # +++ novo
             startX = x
             startY = y
             endX = x + w
             endY = y + h
-            # +++
-
-            # --- antigo
-            # startX = int(pos.left())
-            # startY = int(pos.top())
-            # endX = int(pos.right())
-            # endY = int(pos.bottom())
-            # ---
 
             # add the bounding box coordinates to the rectangles list
             rects.append((startX, startY, endX, endY))
@@ -242,13 +234,20 @@ while True:
 
                 if to.last_side == 'L':
                     total_left_AB += 1
-                    myobj = {'enter': 1, "exit": 0}
+                    # myobj = {'enter': 1, "exit": 0}
                 elif to.last_side == 'R':
                     total_right_AB += 1
-                    myobj = {'enter': 0, "exit": 1}
 
-                url = args["url"]
-                #requests.post(url, data=myobj, timeout=(1, 1))
+                try:
+                    left = total_left_AB - last_total_left
+                    right = total_right_AB - last_total_right
+                    myobj = {'enter': left, "exit": right}
+                    requests.post(args["url"], data=myobj, timeout=(1, 1))
+                    last_total_left = total_left_AB
+                    last_total_right = total_right_AB
+                except:
+                    continue
+
 
         # store the trackable object in our dictionary
         trackableObjects[objectID] = to
