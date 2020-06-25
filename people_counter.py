@@ -116,17 +116,18 @@ while True:
     # less data we have, the faster we can process it), then convert
     # the frame from BGR to RGB for dlib
 
-    frame = imutils.resize(frame, width=net_input_size[0], height=net_input_size[1])
-
-    # linha #line
-    point_a = (0,int( net_input_size[1]/2))
-    point_b = (int(net_input_size[0]), int(net_input_size[1]/2))
-
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #frame = imutils.resize(frame, width=net_input_size[0], height=net_input_size[1])
 
     # if the frame dimensions are empty, set them
     if W is None or H is None:
         (H, W) = frame.shape[:2]
+
+    # linha #line
+    point_a = (int(W/2),0)
+    point_b = (int(W/2),H)
+
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
 
     # if we are supposed to be writing a video to disk, initialize
     # the writer
@@ -150,7 +151,7 @@ while True:
 
         # convert the frame to a blob and pass the blob through the
         # network and obtain the detections
-        class_ids, confidences, boxes = detection_model.detect(frame, args["confidence"])
+        class_ids, confidences, boxes = detection_model.detect(frame, args["confidence"], 0.3)
 
         # loop over the detections
         for idx, confidence, box in zip(class_ids, confidences, boxes):
