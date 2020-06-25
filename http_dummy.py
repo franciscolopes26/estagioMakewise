@@ -1,4 +1,4 @@
-
+from json.decoder import JSONDecodeError
 
 from flask import Flask, request,json #import main Flask class and request object
 
@@ -10,18 +10,27 @@ http_dummy_server = Flask(__name__, static_url_path="",static_folder="./webapp",
 
 TOTAL_EXIT = 0
 TOTAL_ENTER = 0
+Max_people = 0
 
 try:
 	with open('output.json', 'r') as JSON:
 		values = json.load(JSON)
 		TOTAL_EXIT = values["exit"]
 		TOTAL_ENTER = values["enter"]
-except FileNotFoundError or KeyError:
+except:
 	with open('output.json', 'w') as JSON:
 		TOTAL_EXIT = 0
 		TOTAL_ENTER = 0
 		json.dump({'enter': 0, "exit": 0}, JSON)
 
+try:
+    with open('config.json', 'r') as JSON:
+        values = json.load(JSON)
+        MAX_PEOPLE = values["maxx"]
+except :
+    with open('config.json', 'w') as JSON:
+        MAX_PEOPLE = 25
+        json.dump({'maxx': 25}, JSON)
 
 
 # Recives post in json with countings
@@ -99,6 +108,23 @@ def reset():
     )
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
+@http_dummy_server.route('/getpeoplemax', methods=['GET'])
+def people_max():
+    global Max_people
+    data = {'MAX': {'maxx': Max_people}}
+    print("pessoas_maximo %s" % (data))
+    response = http_dummy_server.response_class(
+        response=json.dumps(data),
+        status=200,
+        mimetype='application/json'
+    )
+    #with open('config.json', 'w') as JSON:
+     #   json.dump({'maxx': Max_people}, JSON)
+
+    return response
+
+
 
 
 if __name__ == '__main__':
