@@ -247,7 +247,10 @@ while True:
                     myobj = {'enter': 0, "exit": 1}
 
                 url = args["url"]
-                #requests.post(url, data=myobj, timeout=(1, 1))
+                try:
+                    requests.post(url, data=myobj, timeout=(1, 1))
+                except:
+                    print("Error sending counting")
 
         # store the trackable object in our dictionary
         trackableObjects[objectID] = to

@@ -27,7 +27,7 @@
   "input_params":{
     "scale": 0.007843137,
     "size": [500,500],
-    "mean": 125.5,
+    "mean": 127.5,
     "swapRB" :false,
     "crop" :false
   }
