@@ -25,16 +25,15 @@ import time
 import cv2
 import requests
 
-#
-# caffe, tb para tenserflow, ETC
-# openCV consegue converter a maioria
-# layers = blocos construtores
 
+# caffe
+# python3 people_counter.py -m /home/guilherme/projetos/estagioMakewise/models/caffe/MobileNetSSD_deploy.json -i /home/guilherme/projetos/estagioMakewise/videos/example_01.mp4 -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
 
-# python3 people_counter.py -p /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.prototxt -m /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.caffemodel -i 'rtsp://10.1.203.252:554/user=admin&password=&channel=1&stream=0.sdp' -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
+# tenserflow
+# python3 people_counter.py -m /home/guilherme/projetos/estagioMakewise/models/tensorflow/ssd_mobilenet_v2_coco_2018_03_29.json -i /home/guilherme/projetos/estagioMakewise/videos/example_01.mp4 -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
 
-
-# DESAFIO: SUBSTITUIR TRACKER DO DLIB POR OPENCV
+# tenserflow ssdlite
+# python3 people_counter.py -m /home/guilherme/projetos/estagioMakewise/models/tensorflow/ssdlite_mobilenet_v2_coco_2018_05_09.json -i 'rtsp://10.1.203.252:554/user=admin&password=&channel=1&stream=0.sdp' -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
 
 
 # construct the argument parse and parse the arguments
@@ -117,16 +116,18 @@ while True:
     # the frame from BGR to RGB for dlib
 
     frame = imutils.resize(frame, width=net_input_size[0], height=net_input_size[1])
-
-    # linha #line
-    point_a = (0,int( net_input_size[1]/2))
-    point_b = (int(net_input_size[0]), int(net_input_size[1]/2))
-
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
     # if the frame dimensions are empty, set them
     if W is None or H is None:
         (H, W) = frame.shape[:2]
+
+
+    # linha #line
+    point_a = (W // 2, 0)
+    point_b = (W // 2, H)
+
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+
 
     # if we are supposed to be writing a video to disk, initialize
     # the writer
@@ -156,7 +157,7 @@ while True:
         for idx, confidence, box in zip(class_ids, confidences, boxes):
 
             # if the class label is not a person, ignore it
-            if load_model.lables[idx.astype("int")[0]] != "person":
+            if load_model.labels[idx.astype("int")[0]] != "person":
                 continue
 
             # compute the (x, y)-coordinates of the bounding box
