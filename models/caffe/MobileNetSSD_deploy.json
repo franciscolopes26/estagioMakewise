@@ -1,0 +1,35 @@
+{
+  "model": "./MobileNetSSD_deploy.caffemodel",
+  "config": "./MobileNetSSD_deploy.prototxt",
+  "labels": [
+    "background",
+    "aeroplane",
+    "bicycle",
+    "bird",
+    "boat",
+    "bottle",
+    "bus",
+    "car",
+    "cat",
+    "chair",
+    "cow",
+    "diningtable",
+    "dog",
+    "horse",
+    "motorbike",
+    "person",
+    "pottedplant",
+    "sheep",
+    "sofa",
+    "train",
+    "tvmonitor"
+  ],
+  "input_params":{
+    "scale": 0.007843137,
+    "size": [500,500],
+    "mean": 125.5,
+    "swapRB" :false,
+    "crop" :false
+  }
+
+}
