@@ -88,7 +88,10 @@ trackableObjects = {}
 totalFrames = 0
 total_right_AB = 0
 total_left_AB = 0
-
+last_communication_exit = 0
+last_communication_enter = 0
+totalA = 0
+totalB = 0
 # total_right_AB = 0
 # total_left_AB = 0
 
@@ -242,12 +245,23 @@ while True:
 
                 if to.last_side == 'L':
                     total_left_AB += 1
-                    myobj = {'enter': 1, "exit": 0}
+                    #myobj = {'enter': 1, "exit": 0}
                 elif to.last_side == 'R':
                     total_right_AB += 1
-                    myobj = {'enter': 0, "exit": 1}
+                    #myobj = {'enter': 0, "exit": 1}
 
                 url = args["url"]
+                try:
+                    myobj = {'enter': totalA, "exit": totalB}
+                    requests.post("http://127.0.0.1/", data=myobj, timeout=(1, 1))
+                    last_communication_enter = total_left_AB
+                    last_communication_exit = total_right_AB
+                except:
+                    totalA = total_left_AB - last_communication_enter
+                    totalB = total_right_AB - last_communication_exit
+                    print("Error sending counting")
+
+
                 #requests.post(url, data=myobj, timeout=(1, 1))
 
         # store the trackable object in our dictionary
