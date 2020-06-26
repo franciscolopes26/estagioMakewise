@@ -26,16 +26,21 @@ except:
 
 def what_color():
 
-    if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE / 2):  # 50%
-        return "yellow"
-
-    if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE * 3 / 4):  # 75%
-        return "orange"
 
     if (TOTAL_ENTER - TOTAL_EXIT) >= MAX_PEOPLE:
         return "red"
 
+    if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE * 3 / 4):  # 75%
+        return "orange"
+
+    if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE / 2):  # 50%
+        return "yellow"
+
+
+
+
     return "white"
+
 
 
 
