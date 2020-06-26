@@ -151,7 +151,7 @@ while True:
 
         # convert the frame to a blob and pass the blob through the
         # network and obtain the detections
-        class_ids, confidences, boxes = detection_model.detect(frame, args["confidence"], 0.3)
+        class_ids, confidences, boxes = detection_model.detect(frame, args["confidence"], 0.1)
 
         # loop over the detections
         for idx, confidence, box in zip(class_ids, confidences, boxes):
