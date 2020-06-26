@@ -26,15 +26,12 @@ def orientation(p, q, r):
 
     val = (float(q.y - p.y) * (r.x - q.x)) - (float(q.x - p.x) * (r.y - q.y))
     if (val > 0):
-
         # Clockwise orientation
         return 1
     elif (val < 0):
-
         # Counterclockwise orientation
         return 2
     else:
-
         # Colinear orientation
         return 0
 

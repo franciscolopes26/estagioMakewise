@@ -50,6 +50,5 @@ class LoadModel:
         else:
             return None
 
-    def get_labels(self,id:int):
+    def get_label(self,id:int):
         return self.labels[id]
-

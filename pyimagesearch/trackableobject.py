@@ -3,21 +3,23 @@ from pyimagesearch.point import doIntersect, Point, onSegment, orientation
 
 
 class TrackableObject:
-    def __init__(self, objectID,centroid):
+    def __init__(self, objectID,centroid,label):
         # store the object ID, then initialize a list of centroids
         # using the current centroid
         self.objectID = objectID
+        self.label = label
         self.centroids = [centroid]
         self.last_side = None
-
 
     def update_position(self, new_position):
         if new_position[0] == self.centroids[-1][0] and new_position[1] == self.centroids[-1][1]:
             # in the same place nothing change
             return
-        else:
+        else:           
             self.centroids.append(new_position)
 
+    def get_last_position(self):
+        return self.centroids[-1]
 
     def is_crossing_line(self, point_a, point_b):
         # this function will check if the line segment form by connection

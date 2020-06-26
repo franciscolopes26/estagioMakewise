@@ -8,3 +8,4 @@ venv/
 output.json
 
 config.json
+.vscode/

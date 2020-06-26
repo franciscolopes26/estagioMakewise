@@ -16,6 +16,7 @@ from _ast import Load
 from load_model import LoadModel
 from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
+from pyimagesearch.trackerengine import TrackerEngine
 from imutils.video import VideoStream
 from imutils.video import FPS
 import numpy as np
@@ -76,23 +77,19 @@ writer = None
 W = None
 H = None
 
+
+
 # instantiate our centroid tracker, then initialize a list to store
 # each of our dlib correlation trackers, followed by a dictionary to
 # map each unique object ID to a TrackableObject
-ct = CentroidTracker(maxDisappeared=40, maxDistance=50)
-trackers = []
-trackableObjects = {}
+trackerEngines = {}
+for s in ["person","chair"]:
+    trackerEngines[s] = TrackerEngine(s,maxDisappeared=40, maxDistance=50)
 
 # initialize the total number of frames processed thus far, along
 # with the total number of objects that have moved either up or down
 totalFrames = 0
-total_right_AB = 0
-total_left_AB = 0
-last_total_left = 0
-last_total_right = 0
 
-# total_right_AB = 0
-# total_left_AB = 0
 
 
 # start the frames per second throughput estimator
@@ -142,11 +139,16 @@ while True:
     # box rectangles returned by either (1) our object detector
     # (2) the correlation trackers
     status = "Waiting"
-    rects = []
+    
+    for (label, trackerEngine) in trackerEngines.items():
+        trackerEngine.rects = []
+
 
     # check to see if we should run a more computationally expensive
     # object detection method to aid our tracker
     if totalFrames % args["skip_frames"] == 0:
+        for (label, trackerEngine) in trackerEngines.items():
+            trackerEngine.trackers = []
         # set the status and initialize our new set of object trackers
         status = "Detecting"
         trackers = []
@@ -158,9 +160,12 @@ while True:
         # loop over the detections
         for idx, confidence, box in zip(class_ids, confidences, boxes):
 
-            # if the class label is not a person, ignore it
-            if load_model.labels[idx.astype("int")[0]] != "person":
+            label = load_model.get_label(idx.astype("int")[0])
+            # if the class label is not a configure trakerengine, ignore it
+            if label not in  trackerEngines:
                 continue
+
+            trackerEngine = trackerEngines[label]
 
             # compute the (x, y)-coordinates of the bounding box
             (bx, by, bw, bh) = box.astype("int")
@@ -172,99 +177,69 @@ while True:
             # add the bounding box coordinates to the rectangles list
 
             tracker.init(rgb, (bx, by, bw, bh))
-            rects.append((bx, by,bx + bw, by + bh))
+            trackerEngine.rects.append((bx, by,bx + bw, by + bh))
             # add the tracker to our list of trackers so we can
             # utilize it during skip frames
-            trackers.append(tracker)
+            trackerEngine.trackers.append(tracker)
 
     # otherwise, we should utilize our object *trackers* rather than
     # object *detectors* to obtain a higher frame processing throughput
     else:
-        # loop over the trackers
-        for tracker in trackers:
-            # set the status of our system to be 'tracking' rather
-            # than 'waiting' or 'detecting'
-            status = "Tracking"
+        for (label, trackerEngine) in trackerEngines.items():
+        
+            # loop over the trackers
+            for tracker in trackerEngine.trackers:
+                # set the status of our system to be 'tracking' rather
+                # than 'waiting' or 'detecting'
+                status = "Tracking"
 
-            # update the tracker and grab the updated position
-            retval, boundingBox = tracker.update(rgb)
+                # update the tracker and grab the updated position
+                retval, boundingBox = tracker.update(rgb)
 
-            (x, y, w, h) = [int(v) for v in boundingBox]
+                if retval:
+                    (x, y, w, h) = [int(v) for v in boundingBox]
 
-            # unpack the position object
-            startX = x
-            startY = y
-            endX = x + w
-            endY = y + h
+                    # unpack the position object
+                    startX = x
+                    startY = y
+                    endX = x + w
+                    endY = y + h
 
-            # add the bounding box coordinates to the rectangles list
-            rects.append((startX, startY, endX, endY))
+                    # add the bounding box coordinates to the rectangles list
+                    trackerEngine.rects.append((startX, startY, endX, endY))
 
     # draw a horizontal line in the center of the frame -- once an
     # object crosses this line we will determine whether they were
     # moving to the left or to the right of AB'
     cv2.line(frame, point_a, point_b, (0, 255, 255), 2)
 
-    # use the centroid tracker to associate the (1) old object
-    # centroids with (2) the newly computed object centroids
-    objects = ct.update(rects)
+    for (label, trackerEngine) in trackerEngines.items():
 
-    # loop over the tracked objects
-    for (objectID, centroid) in objects.items():
-        # check to see if a trackable object exists for the current
-        # object ID
-        to = trackableObjects.get(objectID, None)
+        trackerEngine.updateCentroids(point_a,point_b)
+        
+        message = trackerEngine.get_counting_message()
+        if message:
+            try:
+                response  = requests.post(args["url"], data=message, timeout=(1, 10))
+                response.raise_for_status() #raise error on http error
+                trackerEngine.reset_counter() #reset the counter if ok
+            except:
+                print("Error sending counting")
 
-        # if there is no existing trackable object, create one
-        if to is None:
-            to = TrackableObject(objectID, centroid)
+        for (objectID, trackableObject) in trackerEngine.trackableObjects.items():
+            # draw both the ID of the object and the centroid of the
+            # object on the output frame
+            text = "%d %s" % (objectID ,label)
+            centroid = trackableObject.get_last_position()
+            cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
 
-        # otherwise, there is a trackable object so we can utilize it
-        # to determine direction
-        else:
-            # the difference between the y-coordinate of the *current*
-            # centroid and the mean of *previous* centroids will tell
-            # us in which direction the object is moving (negative for
-            # 'up' and positive for 'down')
-            to.update_position(centroid)
-
-            # test if it cross the line
-            if to.is_crossing_line(point_a, point_b):
-                # test if te final position is on left or the right of the line
-
-                if to.last_side == 'L':
-                    total_left_AB += 1
-                    # myobj = {'enter': 1, "exit": 0}
-                elif to.last_side == 'R':
-                    total_right_AB += 1
-
-                try:
-                    left = total_left_AB - last_total_left
-                    right = total_right_AB - last_total_right
-                    myobj = {'enter': left, "exit": right}
-                    requests.post(args["url"], data=myobj, timeout=(1, 1))
-                    last_total_left = total_left_AB
-                    last_total_right = total_right_AB
-                except:
-                    continue
-
-
-        # store the trackable object in our dictionary
-        trackableObjects[objectID] = to
-
-        # draw both the ID of the object and the centroid of the
-        # object on the output frame
-        text = "ID {}".format(objectID)
-        cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-        cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
-
+   
     # construct a tuple of information we will be displaying on the
     # frame
-    info = [
-        ("Left of AB", total_left_AB),
-        ("Right of AB", total_right_AB),
-        ("Status", status),
+    info = [       
+        ("Status", status)
     ]
 
     # loop over the info tuples and draw them on our frame

@@ -4,7 +4,7 @@ from collections import OrderedDict
 import numpy as np
 
 class CentroidTracker:
-	def __init__(self, maxDisappeared=50, maxDistance=50):
+	def __init__(self, maxDisappeared=50, maxDistance=50,remove_callback = None):
 		# initialize the next unique object ID along with two ordered
 		# dictionaries used to keep track of mapping a given object
 		# ID to its centroid and number of consecutive frames it has
@@ -23,6 +23,9 @@ class CentroidTracker:
 		# distance we'll start to mark the object as "disappeared"
 		self.maxDistance = maxDistance
 
+		#Notify of objet remove
+		self.remove_callback = remove_callback
+
 	def register(self, centroid):
 		# when registering an object we use the next available object
 		# ID to store the centroid
@@ -35,6 +38,9 @@ class CentroidTracker:
 		# both of our respective dictionaries
 		del self.objects[objectID]
 		del self.disappeared[objectID]
+		if self.remove_callback :
+			self.remove_callback(objectID)
+		
 
 	def update(self, rects):
 		# check to see if the list of input bounding box rectangles
