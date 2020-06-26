@@ -23,7 +23,8 @@
               <div  style="background-image:url('fundo.jpg');height:100%; background-position: center; background-size:cover; position:fixed; width:100%" >
               </div>
               <div style="top: 50%; left: 50%; transform: translate(-50%,-50%); position: absolute">
-                <h1 style="font-size: 32px !important; position: relative; color:white">Entrada: {{ totalA }} <br> Saida: {{ totalB }} <br> Dentroloja: {{ total }} </h1>
+                <h1 style="font-size: 32px !important; position: relative; color:white">Entrada: {{ totalA }} <br> Saida: {{ totalB }} <br> </h1>
+                <h2 :style="styleObject">Dentroloja: {{ total }} </h2>
                 <hr class="w3-border-grey" style="margin:auto;width:100%">
                 <button  type="submit" @click="submitProduct" class="btn btn-dark">Reset</button>
                </div>
@@ -31,7 +32,14 @@
           data: {
              totalA:0,
              totalB:0,
-             total:0
+             total:0,
+             max_people:0,
+              styleObject: {
+                 color:"white",
+                 fontSize: "32px",
+                 position: "relative"
+               }
+
           },
           methods: {
              getDados:function(){
@@ -43,6 +51,7 @@
                   self.totalA = response.data["total"]["enter"]
                   self.totalB = response.data["total"]["exit"]
                   self.total = response.data["total"]["dentro"]
+                  self.styleObject.color = response.data["total"]["color"]
                }, (error) => {
                 console.log(error);
                });
@@ -56,15 +65,17 @@
                }, (error) => {
                console.log(error);
                });
-            }
+            },
 
-           
-               
                // assuming your response payload is in a data objec
 
             },
             mounted: function () {
-               setInterval(this.getDados, 1000);
+                setInterval(this.getmaxx, 1000);
+                setInterval(this.getDados, 1000);
+
+
+
                
           }   
             
