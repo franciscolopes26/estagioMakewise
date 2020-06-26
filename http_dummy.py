@@ -9,6 +9,7 @@ http_dummy_server = Flask(__name__, static_url_path="", static_folder="./webapp"
 TOTAL_EXIT = 0
 TOTAL_ENTER = 0
 MAX_PEOPLE = 0
+COLOR = " "
 
 try:
     with open('output.json', 'r') as JSON:
@@ -25,10 +26,18 @@ try:
     with open('config.json', 'r') as JSON:
         values = json.load(JSON)
         MAX_PEOPLE = values["maxx"]
+        if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE/2):#50%
+            COLOR = values["color1"]
+
+        if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE * 3 / 4): #75%
+            COLOR = values["color2"]
+
+        if (TOTAL_ENTER - TOTAL_EXIT) >= MAX_PEOPLE:
+            COLOR = values["color3"]
 except:
     with open('config.json', 'w') as JSON:
         MAX_PEOPLE = 25
-        json.dump({'maxx': 25}, JSON)
+        json.dump({'maxx': 25, "color1": "yellow", "color2": "orange", "color3": "red"}, JSON)
 
 
 # Recives post in json with countings
@@ -113,7 +122,9 @@ def reset():
 @http_dummy_server.route('/getpeoplemax', methods=['GET'])
 def people_max():
     global MAX_PEOPLE
-    data = {'MAX': {'maxx': MAX_PEOPLE}}
+    global COLOR
+
+    data = {'maxx': MAX_PEOPLE, 'color': COLOR}
     print("pessoas_maximo %s" % (data))
     response = http_dummy_server.response_class(
         response=json.dumps(data),
