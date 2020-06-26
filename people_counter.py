@@ -48,7 +48,7 @@ ap.add_argument("-c", "--confidence", type=float, default=0.3,
                 help="minimum probability to filter weak detections")
 ap.add_argument("-s", "--skip-frames", type=int, default=7,
                 help="# of skip frames between detections")
-ap.add_argument("-u", "--url", type=str, default='http://127.0.0.1:5000/form/sensor1',
+ap.add_argument("-u", "--url", type=str, default='127.0.0.1:5000',
                 help="server location, localhost:5000 by default")
 args = vars(ap.parse_args())
 
@@ -242,7 +242,7 @@ while True:
                     left = total_left_AB - last_total_left
                     right = total_right_AB - last_total_right
                     myobj = {'enter': left, "exit": right}
-                    requests.post(args["url"], data=myobj, timeout=(1, 1))
+                    requests.post('http://'+args["url"]+'/form/sensor1', data=myobj, timeout=(1, 1))
                     last_total_left = total_left_AB
                     last_total_right = total_right_AB
                 except:
