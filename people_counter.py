@@ -25,16 +25,15 @@ import time
 import cv2
 import requests
 
-#
-# caffe, tb para tenserflow, ETC
-# openCV consegue converter a maioria
-# layers = blocos construtores
 
+# caffe
+# python3 people_counter.py -m /home/guilherme/projetos/estagioMakewise/models/caffe/MobileNetSSD_deploy.json -i /home/guilherme/projetos/estagioMakewise/videos/example_01.mp4 -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
 
-# python3 people_counter.py -p /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.prototxt -m /home/guilherme/projetos/estagioMakewise/mobilenet_ssd/MobileNetSSD_deploy.caffemodel -i 'rtsp://10.1.203.252:554/user=admin&password=&channel=1&stream=0.sdp' -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
+# tenserflow
+# python3 people_counter.py -m /home/guilherme/projetos/estagioMakewise/models/tensorflow/ssd_mobilenet_v2_coco_2018_03_29.json -i /home/guilherme/projetos/estagioMakewise/videos/example_01.mp4 -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
 
-
-# DESAFIO: SUBSTITUIR TRACKER DO DLIB POR OPENCV
+# tenserflow ssdlite
+# python3 people_counter.py -m /home/guilherme/projetos/estagioMakewise/models/tensorflow/ssdlite_mobilenet_v2_coco_2018_05_09.json -i 'rtsp://10.1.203.252:554/user=admin&password=&channel=1&stream=0.sdp' -o /home/guilherme/projetos/estagioMakewise/output/output_03.avi
 
 
 # construct the argument parse and parse the arguments
@@ -89,6 +88,8 @@ trackableObjects = {}
 totalFrames = 0
 total_right_AB = 0
 total_left_AB = 0
+last_total_left = 0
+last_total_right = 0
 
 # total_right_AB = 0
 # total_left_AB = 0
@@ -116,17 +117,18 @@ while True:
     # less data we have, the faster we can process it), then convert
     # the frame from BGR to RGB for dlib
 
-    #frame = imutils.resize(frame, width=net_input_size[0], height=net_input_size[1])
-
+    frame = imutils.resize(frame, width=net_input_size[0], height=net_input_size[1])
     # if the frame dimensions are empty, set them
     if W is None or H is None:
         (H, W) = frame.shape[:2]
 
+
     # linha #line
-    point_a = (int(W/2),0)
-    point_b = (int(W/2),H)
+    point_a = (W // 2, 0)
+    point_b = (W // 2, H)
 
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
 
 
     # if we are supposed to be writing a video to disk, initialize
@@ -157,7 +159,7 @@ while True:
         for idx, confidence, box in zip(class_ids, confidences, boxes):
 
             # if the class label is not a person, ignore it
-            if load_model.lables[idx.astype("int")[0]] != "person":
+            if load_model.labels[idx.astype("int")[0]] != "person":
                 continue
 
             # compute the (x, y)-coordinates of the bounding box
@@ -190,20 +192,10 @@ while True:
             (x, y, w, h) = [int(v) for v in boundingBox]
 
             # unpack the position object
-
-            # +++ novo
             startX = x
             startY = y
             endX = x + w
             endY = y + h
-            # +++
-
-            # --- antigo
-            # startX = int(pos.left())
-            # startY = int(pos.top())
-            # endX = int(pos.right())
-            # endY = int(pos.bottom())
-            # ---
 
             # add the bounding box coordinates to the rectangles list
             rects.append((startX, startY, endX, endY))
@@ -242,16 +234,20 @@ while True:
 
                 if to.last_side == 'L':
                     total_left_AB += 1
-                    myobj = {'enter': 1, "exit": 0}
+                    # myobj = {'enter': 1, "exit": 0}
                 elif to.last_side == 'R':
                     total_right_AB += 1
-                    myobj = {'enter': 0, "exit": 1}
 
-                url = args["url"]
                 try:
-                    requests.post(url, data=myobj, timeout=(1, 1))
+                    left = total_left_AB - last_total_left
+                    right = total_right_AB - last_total_right
+                    myobj = {'enter': left, "exit": right}
+                    requests.post(args["url"], data=myobj, timeout=(1, 1))
+                    last_total_left = total_left_AB
+                    last_total_right = total_right_AB
                 except:
-                    print("Error sending counting")
+                    continue
+
 
         # store the trackable object in our dictionary
         trackableObjects[objectID] = to

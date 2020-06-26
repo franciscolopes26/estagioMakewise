@@ -16,7 +16,7 @@ class LoadModel:
                 if s not in self.config:
                     raise ValueError("Invalide configuration: missing %s" % s)
 
-            self.lables = self.config['labels']
+            self.labels = self.config['labels']
             if 'size' in self.config['input_params']:
                 self.size = tuple(self.config['input_params']['size'])
             self.model_file =str(config_file_path.parent.joinpath(self.config['model']));
@@ -42,7 +42,7 @@ class LoadModel:
         return detection_model
 
     def get_labels(self):
-        return self.lables
+        return self.labels
 
     def get_net_input_size(self):
         if self.size :
@@ -50,6 +50,6 @@ class LoadModel:
         else:
             return None
 
-    def get_label(self,id:int):
-        return self.lables[id]
+    def get_labels(self,id:int):
+        return self.labels[id]
 
