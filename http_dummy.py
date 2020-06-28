@@ -1,3 +1,5 @@
+#CODIGO INCOMPLETO NA LINHA 73
+
 from json.decoder import JSONDecodeError
 
 from flask import Flask, request, json  # import main Flask class and request object
@@ -6,42 +8,37 @@ http_dummy_server = Flask(__name__, static_url_path="", static_folder="./webapp"
 
 # Global variables to store info
 
-TOTAL_EXIT = 0
-TOTAL_ENTER = 0
-MAX_PEOPLE = 0
+#LABEL = None
+#TOTAL_EXIT = 0
+#TOTAL_ENTER = 0
+#MAX_PEOPLE = 0
 
+valueList = []
+valueData = {"label": None, "enter": None, "exit": None, "maxx": None}
 
 try:
     with open('output.json', 'r') as JSON:
-        values = json.load(JSON)
-        TOTAL_EXIT = values["exit"]
-        TOTAL_ENTER = values["enter"]
-        MAX_PEOPLE = values["maxx"]
-except:
-    with open('output.json', 'w') as JSON:
-        TOTAL_EXIT = 0
-        TOTAL_ENTER = 0
-        MAX_PEOPLE = 0
-        json.dump({"enter": 0, "exit": 0, "maxx": 25}, JSON)
+        valueList = json.load(JSON)
+        #print(valueList)
+except: # essa parte não é necessária conforme o código atual
+    print("no output.json found")
+#    with open('output.json', 'w') as JSON:
+ #       TOTAL_EXIT = 0
+  #      TOTAL_ENTER = 0
+   #     MAX_PEOPLE = 0
+    #    json.dump({"enter": 0, "exit": 0, "maxx": 25}, JSON)
+
+for item in valueList: #idog iperson
+    print("a "+item["label"])
 
 def what_color():
-
-
     if (TOTAL_ENTER - TOTAL_EXIT) >= MAX_PEOPLE:
         return "red"
-
     if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE * 3 / 4):  # 75%
         return "orange"
-
     if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE / 2):  # 50%
         return "yellow"
-
-
-
-
     return "white"
-
-
 
 
 # Recives post in json with countings
@@ -52,14 +49,19 @@ def what_color():
 #
 @http_dummy_server.route('/json/<sensor_id>', methods=['POST'])
 def counting_json(sensor_id):
-    global TOTAL_ENTER
-    global TOTAL_EXIT
+    global valueList
     req_data = request.get_json()
+
     if req_data:
-        if (req_data['enter']):
-            TOTAL_ENTER += int(req_data['enter'])
-        if (req_data['exit']):
-            TOTAL_EXIT += int(req_data['exit'])
+        print("HELPME")
+        # for item in values.items():
+        #     if item['label'] == req_data['label']:
+        #         valueData = {"label": None, "enter": None, "exit": None}
+        #         valueData['enter'] += item['enter']
+        #         valueData['exit'] += item['exit']
+        #         valueList.update(valueData)
+        #         print('AAAAA' + valueList)
+
     print("Revice counting from sensor %s = %s" % (sensor_id, req_data))
     return countings()
 
@@ -68,14 +70,21 @@ def counting_json(sensor_id):
 #
 @http_dummy_server.route('/form/<sensor_id>', methods=['POST'])
 def counting_post(sensor_id):
-    global TOTAL_ENTER
-    global TOTAL_EXIT
-    req_data = request.values
-    if req_data:
-        if (req_data['enter']):
-            TOTAL_ENTER += int(req_data['enter'])
-        if (req_data['exit']):
-            TOTAL_EXIT += int(req_data['exit'])
+    global valueList
+
+    req_data = request.values #INCOMPLETO!!!!!
+
+    print("testetesteteste" + req_data["label"])
+
+    if req_data["label"] in valueList:
+        for item in valueList:  # idog iperson
+            if req_data["label"] == item["label"]:
+                item["enter"] += int(req_data["enter"])
+                print(item["enter"])
+                item["exit"] += int(req_data["exit"])
+    else:
+        valueList.append(req_data)
+
     print("Revice counting from sensor %s = %s" % (sensor_id, (req_data['enter'], req_data['exit'])))
     return countings()
 
@@ -83,20 +92,26 @@ def counting_post(sensor_id):
 # Return current counting
 @http_dummy_server.route('/counting', methods=['GET'])
 def countings():
-    global TOTAL_ENTER
-    global TOTAL_EXIT
+    global valueList
 
-    data = {'total': {'enter': TOTAL_ENTER, 'exit': TOTAL_EXIT, 'dentro': TOTAL_ENTER - TOTAL_EXIT, 'color': what_color()}}
+    data = valueList
     print("Current %s" % (data))
     response = http_dummy_server.response_class(
         response=json.dumps(data),
         status=200,
         mimetype='application/json'
     )
+    with open('output.json', 'w') as JSON:  # PLANO > append da informação
+        try: # verificar se o objeto existe no valueList, atualizar conforme e atualizar
+            json.dump(valueList, JSON)
+            #for item in valueList:  # idog iperson
+             #   if req_data["label"] == item["label"]:
+              #      print("eh" + item["label"])
 
-    with open('output.json', 'w') as JSON:
-        json.dump({'enter': TOTAL_ENTER, "exit": TOTAL_EXIT, "maxx": MAX_PEOPLE}, JSON)
-
+            #json.dump(valueList, JSON)
+            #json.dump({'enter': TOTAL_ENTER, "exit": TOTAL_EXIT, "maxx": MAX_PEOPLE}, JSON)
+        except:
+            print("iso é apenas um teste")
     return response
 
 
@@ -107,8 +122,6 @@ def root():
 
 @http_dummy_server.route('/reset', methods=['POST'])
 def reset():
-    global TOTAL_ENTER
-    global TOTAL_EXIT
 
     TOTAL_EXIT = 0
     TOTAL_ENTER = 0

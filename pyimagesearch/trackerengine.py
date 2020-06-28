@@ -2,12 +2,12 @@ from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
 
 class TrackerEngine ():
-    def __init__(self,lable,maxDisappeared=40, maxDistance=50):
+    def __init__(self,label,maxDisappeared=40, maxDistance=50):
         super().__init__()
         # instantiate our centroid tracker, then initialize a list to store
         # each of our dlib correlation trackers, followed by a dictionary to
         # map each unique object ID to a TrackableObject
-        self.label = lable
+        self.label = label
         self.ct = CentroidTracker(maxDisappeared=maxDisappeared, maxDistance=maxDistance, remove_callback=self.remove_callback)
         self.trackers = []
         self.trackableObjects = {}
@@ -54,13 +54,13 @@ class TrackerEngine ():
             self.trackableObjects[objectID] = to
         self.rects = []
 
-    def get_counting_message(self ):
-        if self.total_right_AB> 0 or self.total_left_AB>0:
-            return {'enter': self.total_left_AB, "exit": self.total_right_AB, "class": self.label}
+    def get_counting_message(self): #PLANO
+        if self.total_right_AB > 0 or self.total_left_AB > 0:
+            return {"label": self.label, 'enter': self.total_left_AB, "exit": self.total_right_AB}
         else:
             return None
 
-    def remove_callback(self, objectID ):
+    def remove_callback(self, objectID):
         del self.trackableObjects[objectID]
 
     def reset_counter(self):

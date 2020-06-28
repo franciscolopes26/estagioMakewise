@@ -219,8 +219,8 @@ while True:
         
         message = trackerEngine.get_counting_message()
         if message:
-            try:
-                response  = requests.post(args["url"], data=message, timeout=(1, 10))
+            try: #PLANO
+                response = requests.post(args["url"], data=message, timeout=(1, 10))
                 response.raise_for_status() #raise error on http error
                 trackerEngine.reset_counter() #reset the counter if ok
             except:
