@@ -19,26 +19,19 @@
        new Vue({
           el:'#app',
           template:`
-            <div class="container">
               <div style="background-image:url('fundo.jpg');min-height: 100vh; background-position: center; background-size:cover; width:100%">
 
 
                 <ul style="width: 100%;display: grid;padding: 1rem;grid-gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
-                    <li v-for="item in values" style="display: block; border: solid 2px white;">
+                    <li v-for="item in values" style="display: block; border: solid 2px white; padding: 1em; border-radius: 30px;">
                         <h1 style="font-size: 64px !important; color:white"> {{ item["label"] }} </h1>
                         <h2 style="font-size: 32px !important; color:white"> Entrou: {{ item["enter"] }} </h1>
                         <h2 style="font-size: 32px !important; color:white"> Saiu: {{ item["exit"] }} </h1>
                         <h2 style="font-size: 32px !important; color:white"> Dentro: {{ item["enter"] - item["exit"] }} </h1>
+                        <button  type="submit" @click="submitProduct" class="btn btn-outline-danger">Reset</button>
                     </li>
                 </ul>
-              </div>
-<!--              <div style="">-->
-<!--                <h1 style="font-size: 32px !important; position: relative; color:white">Entrada: {{ totalA }} <br> Saida: {{ totalB }} <br> </h1>-->
-<!--                <h2 :style="styleObject">Dentroloja: {{ total }} </h2>-->
-<!--                <hr class="w3-border-grey" style="margin:auto;width:100%">-->
-<!--                <button  type="submit" @click="submitProduct" class="btn btn-dark">Reset</button>-->
-<!--               </div>-->
-            </div>`,
+              </div>`,
           data: {
              values: [],
               styleObject: {
