@@ -142,6 +142,20 @@ def reset():
     return response
 
 
+@http_dummy_server.route('/change', methods=['POST'])
+def change():
+    global MAX_PEOPLE
+    req_data = request.get_json()
+    MAX_PEOPLE = int(req_data["maxx"])
+
+    data = {'msg': 'RESET has been executed'}
+    response = http_dummy_server.response_class(
+        status=200,
+        response=json.dumps(data),
+        mimetype='application/json'
+    )
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 if __name__ == '__main__':
