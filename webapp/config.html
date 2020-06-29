@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>config</title>
+    <link rel="stylesheet" href="./css/bootstrap-4.5.0.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="/js/jquery-3.5.1.min.js"></script>
+    <script src="/js/bootstrap-4.5.0.min.js"></script>
+
+    <script src="/js/axios-0.19.2.min.js"></script>
+    <script src="/js/vue-2.6.11.js"></script>
+
+</head>
+<body style="height: 100%">
+<div id="app"></div>
+
+
+<script>
+       new Vue({
+          el:'#app',
+          template:`
+              <div style="background-image:url('fundo.jpg');min-height: 100vh; background-position: center; background-size:cover; width:100%">
+
+                <ul style="width: 100%;display: grid;padding: 1rem;grid-gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+                    <li :key="item['label']" v-for="item in maxValues" style="display: block; border: solid 2px white; padding: 1em; border-radius: 30px;">
+                       <div>
+                            <input v-model="item['maxValue']" type="text" :placeholder="'Change ' + item['label']"/>
+                            <button  type="submit" @click="changeMaxValue(item['label'],item['maxValue'])" class="button">change</button>
+
+                        </div>
+                    </li>
+                </ul>
+              </div>`,
+          data: {
+              maxValues: [],
+
+          },
+          methods: { // PLANO > alterar dados individuais para o json, substituir o display por um for com os dados
+
+             getDados:function(){
+           
+               var self = this;
+               axios.get('/maxvalues')
+               .then((response) => {
+                  console.log(response);
+                  self.maxValues = response.data
+               }, (error) => {
+                console.log(error);
+               });
+             },
+             changeMaxValue: function (label,value){
+               var self = this;
+               axios.post('/change',{"maxValue":value, "label": label})
+               .then((response) => {
+
+
+               }, (error) => {
+               console.log(error);
+               });
+               console.log(label,value);
+
+             }
+          },
+
+          mounted: function () {
+              this.getDados();
+
+          }   
+            
+      })     
+
+</script>
+
+
+</body>
+</html>

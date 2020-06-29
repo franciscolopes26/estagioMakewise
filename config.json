@@ -1,1 +1,5 @@
-{"label": "chair","maxx": 25, "color1": "#ffff00", "color2": "#555500", "color3": "#FF0000"}
+[{"label": "person", "maxValue":25 },{"label": "car", "maxValue":25 }]
+
+
+
+

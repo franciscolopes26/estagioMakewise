@@ -18,18 +18,17 @@ TOTAL_ENTER = 0
 MAX_PEOPLE = 0
 
 valueList = []
-configList = []
+config = []
 
 try:
     with open('output.json', 'r') as f:
         valueList = json.load(f)
+    with open('config.json', 'r') as f:
+        config = json.load(f)
 except Exception as ex:
     LOG_APP.info('output.json not found')
+
 LOG_APP.info('History: %s' % str(valueList))
-
-#try:
-#    for item in valueList:
-
 
 
 def what_color():
@@ -130,16 +129,16 @@ def root():
     return http_dummy_server.send_static_file("index.html")
 
 
+@http_dummy_server.route('/config')
+def config():
+    return http_dummy_server.send_static_file("config.html")
+
+
 @http_dummy_server.route('/reset', methods=['POST'])
 def reset():
-    global valueList
-    req_data = request.get_json()
 
-    for item in valueList:
-        if req_data["label"] == item["label"]:
-            item["enter"] = 0
-            item["exit"] = 0
-
+    TOTAL_EXIT = 0
+    TOTAL_ENTER = 0
 
     data = {'msg': 'RESET has been executed'}
     response = http_dummy_server.response_class(
@@ -147,18 +146,23 @@ def reset():
         response=json.dumps(data),
         mimetype='application/json'
     )
-
-
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 
 @http_dummy_server.route('/change', methods=['POST'])
-def getMaxValue():
-    global configList
-    req_data = request.get_json()
-    MAX_PEOPLE = int(req_data["maxx"])
+def change():
 
+    global config
+    req_data = request.get_json()
+    label = str(req_data["label"])
+    value = int(req_data["maxValue"])
+    for c in config:
+        if label== c["label"]:
+            c["maxValue"] = value
+
+    with open('config.json', 'w') as f:
+        json.dump(config, f)
     data = {'msg': 'RESET has been executed'}
     response = http_dummy_server.response_class(
         status=200,
@@ -167,6 +171,20 @@ def getMaxValue():
     )
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
+
+@http_dummy_server.route('/maxvalues', methods=['GET'])
+def getMaxValues():
+
+    global config
+
+    response = http_dummy_server.response_class(
+             status=200,
+             response=config,
+             mimetype='application/json'
+    )
+    return response
+
 
 
 if __name__ == '__main__':
