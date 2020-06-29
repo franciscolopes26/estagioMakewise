@@ -18,14 +18,18 @@ TOTAL_ENTER = 0
 MAX_PEOPLE = 0
 
 valueList = []
+configList = []
 
 try:
     with open('output.json', 'r') as f:
         valueList = json.load(f)
 except Exception as ex:
     LOG_APP.info('output.json not found')
-
 LOG_APP.info('History: %s' % str(valueList))
+
+#try:
+#    for item in valueList:
+
 
 
 def what_color():
@@ -128,9 +132,14 @@ def root():
 
 @http_dummy_server.route('/reset', methods=['POST'])
 def reset():
+    global valueList
+    req_data = request.get_json()
 
-    TOTAL_EXIT = 0
-    TOTAL_ENTER = 0
+    for item in valueList:
+        if req_data["label"] == item["label"]:
+            item["enter"] = 0
+            item["exit"] = 0
+
 
     data = {'msg': 'RESET has been executed'}
     response = http_dummy_server.response_class(
@@ -138,13 +147,15 @@ def reset():
         response=json.dumps(data),
         mimetype='application/json'
     )
+
+
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 
 @http_dummy_server.route('/change', methods=['POST'])
-def change():
-    global MAX_PEOPLE
+def getMaxValue():
+    global configList
     req_data = request.get_json()
     MAX_PEOPLE = int(req_data["maxx"])
 

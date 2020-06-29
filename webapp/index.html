@@ -18,88 +18,92 @@
 
 
 <script>
-       new Vue({
-          el:'#app',
-          template:`
-              <div style="background-image:url('fundo.jpg');min-height: 100vh; background-position: center; background-size:cover; width:100%">
-
+    new Vue({
+        el:'#app',
+        template:`
+            <div style="background-image:url('fundo.jpg');min-height: 100vh; background-position: center; background-size:cover; width:100%">
                 <ul style="width: 100%;display: grid;padding: 1rem;grid-gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
                     <li :key="values" v-for="item in values" style="display: block; border: solid 2px white; padding: 1em; border-radius: 30px;">
                         <h1 style="font-size: 64px !important; color:white"> {{ item["label"] }} </h1>
                         <h2 style="font-size: 32px !important; color:white"> Entrou: {{ item["enter"] }} </h1>
                         <h2 style="font-size: 32px !important; color:white"> Saiu: {{ item["exit"] }} </h1>
                         <h2 style="font-size: 32px !important; color:white"> Dentro: {{ item["enter"] - item["exit"] }} </h1>
-                        <button  type="submit" @click="submitProduct" class="btn btn-outline-danger">Reset</button>
+                        <button type="submit" v-on:click="resetValue(item.label)" class="btn btn-outline-danger">Reset</button>
                     </li>
                 </ul>
 
-              <a href="#" class="button" id="button"> Edit</a>
-              <div class="popup">
-               <div class="popup-content">
-               <input v-model="max_people" type="text" placeholder="Change-maxpeople" id="nrchange">
-               <button  type="submit" @click="maxPeople" class="button">change</button>
-               <img src="close.png" alt="Close" class="close">
-               </div>
-
-              </div>
+                <a href="#" class="button" id="button"> Edit</a>
+                <div class="popup">
+                    <div class="popup-content">
+                        <input v-model="max_people" type="text" placeholder="Change-maxpeople" id="nrchange">
+                        <button  type="submit" @click="maxPeople" class="button">change</button>
+                        <img src="close.png" alt="Close" class="close">
+                    </div>
+                </div>
 
             </div>
-              `,
-          data: {
-              values: []
-          },
-          methods: { // PLANO > alterar dados individuais para o json, substituir o display por um for com os dados
+        `,
 
-             getDados:function(){
-           
-               var self = this;
-               axios.get('/counting')
-               .then((response) => {
-                  console.log(response);
-                  self.values = response.data
-                  // self.styleObject.color = response.data["total"]["color"] // pegar de um config.json
-               }, (error) => {
-                console.log(error);
-               });
+
+        data: {
+            values: []
+        },
+
+
+        methods: { // PLANO > alterar dados individuais para o json, substituir o display por um for com os dados
+            getDados:function(){
+
+                var self = this;
+                axios.get('/counting')
+
+                .then((response) => {
+                    console.log(response);
+                    self.values = response.data
+<!--                    self.styleObject.color = response.data["total"]["color"] // pegar de um config.json-->
+                }, (error) => {
+                    console.log(error);
+                    });
              },
-             //BOTAO POST
-             submitProduct: function () {
-               var self = this;
-               axios.post('/reset',)
-               .then((response) => {
-               self.getDados();
-               }, (error) => {
-               console.log(error);
-               });
-            },
 
-            maxPeople: function () {
-               var self = this;
-               console.log(this.max_people);
-               axios.post('/change',{"maxx":self.max_people})
-               .then((response) => {
-                  
-               
-               }, (error) => {
-               console.log(error);
-               });
-            },
 
-               // assuming your response payload is in a data objec
+             resetValue: function(label) {
+                var self = this;
+                axios.post('/reset', {"label": label})
+                .then((response) => {
+                    self.getDados();
+                }, (error) => {
+                console.log(error);
+                 });
+             },
 
-            },
-            mounted: function () {
-<!--                setInterval(this.getmaxx, 1000);-->
-                setInterval(this.getDados, 1000);
+             maxPeople: function () {
+                var self = this;
+                console.log(this.max_people);
+                axios.post('/change',{"maxx":self.max_people})
+                .then((response) => {
 
-          }   
+                }, (error) => {
+                    console.log(error);
+                });
+             },
+
+             // assuming your response payload is in a data objec
+
+        },
+        mounted: function () {
+<!--        setInterval(this.getmaxx, 1000);-->
+            setInterval(this.getDados, 1000);
+
+        }
             
-      })
-   document.getElementById("button").addEventListener("click",function(){
-   document.querySelector(".popup").style.display = "flex";
+    })
+
+
+document.getElementById("button").addEventListener("click",function(){
+    document.querySelector(".popup").style.display = "flex";
 })
-   document.querySelector(".close").addEventListener("click",function(){
-   document.querySelector(".popup").style.display = "none";
+document.querySelector(".close").addEventListener("click",function(){
+document.querySelector(".popup").style.display = "none";
 
 })
 </script>
