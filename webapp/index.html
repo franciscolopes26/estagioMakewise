@@ -34,12 +34,11 @@
             </div>
             <div class="popup">
                <div class="popup-content">
-               <input type="text" placeholder="Change-maxpeople">
-               <a href="#" class="button"> Edit</a>
+               <input v-model="max_people" type="text" placeholder="Change-maxpeople" id="nrchange">
+               <button  type="submit" @click="maxPeople" class="button">change</button>
                <img src="close.png" alt="Close" class="close">  
                </div>
             </div>`,
-
          
         
            
@@ -76,6 +75,18 @@
                axios.post('/reset',)
                .then((response) => {
                self.getDados();
+               }, (error) => {
+               console.log(error);
+               });
+            },
+
+            maxPeople: function () {
+               var self = this;
+               console.log(this.max_people);
+               axios.post('/change',{"maxx":self.max_people})
+               .then((response) => {
+                  
+               
                }, (error) => {
                console.log(error);
                });
