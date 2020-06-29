@@ -8,6 +8,7 @@ from flask import Flask, request, json  # import main Flask class and request ob
 http_dummy_server = Flask(__name__, static_url_path="", static_folder="./webapp", )  # create the Flask app
 logging.basicConfig()
 LOG_APP = logging.getLogger('app')
+logging.getLogger().setLevel(logging.INFO)
 
 # Global variables to store info
 
@@ -23,7 +24,6 @@ try:
         valueList = json.load(JSON)
 except Exception as ex:
     LOG_APP.info('output.json not found')
-    print("no output.json found")
 
 LOG_APP.info('History: %s' % str(valueList))
 
@@ -49,6 +49,8 @@ def counting_json(sensor_id):
     global valueList
     req_data = request.get_json()
 
+    print(req_data)
+
     if req_data:
         print("HELPME")
         # for item in values.items():
@@ -68,15 +70,15 @@ def counting_json(sensor_id):
 @http_dummy_server.route('/form/<sensor_id>', methods=['POST'])
 def counting_post(sensor_id):
     global valueList
-    LOG_APP.info('New counting recevied for device %s' % str(sensor_id))
+    LOG_APP.info('New counting received for device %s' % str(sensor_id))
     req_data = request.values
     found = False
     for item in valueList:
         if req_data["label"] == item["label"]:
             found = True
             LOG_APP.info('Label %s already exists! updating values...' % str(req_data["label"]))
-            item["enter"] += int(req_data["enter"])
-            item["exit"] += int(req_data["exit"])
+            item["enter"] = int(item["enter"]) + int(req_data["enter"])
+            item["exit"] = int(item["exit"]) + int(req_data["exit"])
     if not found:
         LOG_APP.info('Label %s does not exist! appending new value...' % str(req_data["label"]))
         valueList.append(req_data)
@@ -91,8 +93,8 @@ def counting_post(sensor_id):
 
 def save_data():
     try:
-        with open('output.json', 'w') as JSON:  # PLANO > append da informação
-            json.dump(valueList, JSON)
+        with open('output.json', 'w') as f:  # PLANO > append da informação
+            json.dump(valueList, f)
     except Exception as ex:
         LOG_APP.exception("Error saving history file", ex)
 
@@ -103,24 +105,14 @@ def countings():
     global valueList
 
     data = valueList
-    print("Current %s" % (data))
-    response = http_dummy_server.response_class(
+
+    LOG_APP.info("Current %s" % data)
+
+    return http_dummy_server.response_class(
         response=json.dumps(data),
         status=200,
         mimetype='application/json'
     )
-    with open('output.json', 'w') as JSON:  # PLANO > append da informação
-        try: # verificar se o objeto existe no valueList, atualizar conforme e atualizar
-            json.dump(valueList, JSON)
-            #for item in valueList:  # idog iperson
-             #   if req_data["label"] == item["label"]:
-              #      print("eh" + item["label"])
-
-            #json.dump(valueList, JSON)
-            #json.dump({'enter': TOTAL_ENTER, "exit": TOTAL_EXIT, "maxx": MAX_PEOPLE}, JSON)
-        except:
-            print("iso é apenas um teste")
-    return response
 
 
 @http_dummy_server.route('/')
