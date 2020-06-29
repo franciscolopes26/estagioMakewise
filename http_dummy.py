@@ -20,8 +20,8 @@ MAX_PEOPLE = 0
 valueList = []
 
 try:
-    with open('output.json', 'r') as JSON:
-        valueList = json.load(JSON)
+    with open('output.json', 'r') as f:
+        valueList = json.load(f)
 except Exception as ex:
     LOG_APP.info('output.json not found')
 
@@ -92,12 +92,18 @@ def counting_post(sensor_id):
 
 
 def save_data():
+    global valueList
+
     try:
         with open('output.json', 'w') as f:  # PLANO > append da informação
             json.dump(valueList, f)
     except Exception as ex:
         LOG_APP.exception("Error saving history file", ex)
-
+    try:
+        with open('output.json', 'r') as f:
+            valueList = json.load(f)
+    except:
+        print("bufixing")
 
 # Return current counting
 @http_dummy_server.route('/counting', methods=['GET'])
