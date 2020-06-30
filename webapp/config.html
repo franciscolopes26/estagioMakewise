@@ -18,61 +18,75 @@
 
 
 <script>
-       new Vue({
-          el:'#app',
-          template:`
-              <div style="background-image:url('fundo.jpg');min-height: 100vh; background-position: center; background-size:cover; width:100%">
-
-                <ul style="width: 100%;display: grid;padding: 1rem;grid-gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
-                    <li :key="item['label']" v-for="item in maxValues" style="display: block; border: solid 2px white; padding: 1em; border-radius: 30px;">
-                       <div>
-                            <input v-model="item['maxValue']" type="text" :placeholder="'Change' + item['label']"/>
-                            <button  type="submit" @click="changeMaxValue(item['label'],item['maxValue'])" class="button">change</button>
-
+    new Vue({
+        el:'#app',
+            template:`
+                <div style="background-image:url('fundo.jpg');min-height: 100vh; background-position: center; background-size:cover; width:100%">
+                    <ul style="width: 100%;display: grid;padding: 1rem;grid-gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+                        <div :key="item['label']" v-for="item in maxValues" style="display:contents">
+                            <li v-if="item['ignore']" style="display: block; border: solid 2px red; padding: 1em; border-radius: 30px;">
+                                <h1 style="font-size: 64px !important; color:red"> {{ item["label"] }} </h1>
+                                <label style="font-size: 32px !important; color:white; width: 50%">maximum: </label><input v-model="item['maxValue']" type="text" :placeholder="'Change' + item['label']" style="display: inline-block;margin: 0;width: 50%;" />
+                                <div style="display:block">
+                                    <button  type="submit" @click="changeMaxValue(item['label'],item['maxValue'])" class="btn btn-outline-success" style="transition: color 0s;">Confirm changes</button>
+                                                                        <button  type="submit" @click="displayToggle(item['label'],item['ignore'])" class="btn btn-outline-light" style="transition: color 0s;">toggle display</button>
+                                </div>
+                            </li>
+                            <li v-else style="display: block; border: solid 2px white; padding: 1em; border-radius: 30px;">
+                                <h1 style="font-size: 64px !important; color:white"> {{ item["label"] }} </h1>
+                                <label style="font-size: 32px !important; color:white; width: 50%">maximum: </label><input v-model="item['maxValue']" type="text" :placeholder="'Change' + item['label']" style="display: inline-block;margin: 0;width: 50%;" />
+                                <div style="display:block">
+                                    <button  type="submit" @click="changeMaxValue(item['label'],item['maxValue'])" class="btn btn-outline-success" style="transition: color 0s;">Confirm changes</button>
+                                    <button  type="submit" @click="displayToggle(item['label'],item['ignore'])" class="btn btn-outline-light" style="transition: color 0s;">toggle display</button>
+                                </div>
+                            </li>
                         </div>
-                    </li>
-                </ul>
-              </div>`,
-          data: {
-              maxValues: [],
+                    </ul>
+                    <a href="/" class="btn btn-outline-warning" style="transition: color 0s;">Return</a>
+                </div>`,
+        data: {
+            maxValues: [],
+        },
+            methods: { // PLANO > alterar dados individuais para o json, substituir o display por um for com os dados
 
-          },
-          methods: { // PLANO > alterar dados individuais para o json, substituir o display por um for com os dados
-
-             getDados:function(){
+            getDados:function(){
            
-               var self = this;
-               axios.get('/maxvalues')
-               .then((response) => {
-                  console.log(response);
-                  self.maxValues = response.data
-               }, (error) => {
-                console.log(error);
-               });
-             },
-             changeMaxValue: function (label,value){
-               var self = this;
-               axios.post('/change',{"maxValue":value, "label": label})
-               .then((response) => {
+                var self = this;
+                axios.get('/maxvalues')
+                .then((response) => {
+                    console.log(response);
+                    self.maxValues = response.data
+                }, (error) => {
+                    console.log(error);
+                });
+            },
+            displayToggle:function(label, ignore){
 
+                var self = this;
+                axios.post('/toggle',{"label": label, "ignore": ignore})
+                .then((response) => {
+                }, (error) => {
+                    console.log(error);
+                });
+                this.getDados();
+            },
+            changeMaxValue: function (label,value){
+                var self = this;
+                axios.post('/change',{"maxValue":value, "label": label})
+                .then((response) => {
+                }, (error) => {
+                    console.log(error);
+                });
+                console.log(label,value);
 
-               }, (error) => {
-               console.log(error);
-               });
-               console.log(label,value);
-
-             }
-          },
-
-          mounted: function () {
-              this.getDados();
-               console.log(this.maxValues)
-          }   
-            
-      })     
-
+            }
+        },
+        mounted: function () {
+            this.getDados();
+            console.log(this.maxValues)
+        }
+    })
 </script>
-
 
 </body>
 </html>

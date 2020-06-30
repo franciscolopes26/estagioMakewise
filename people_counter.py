@@ -83,7 +83,7 @@ H = None
 # each of our dlib correlation trackers, followed by a dictionary to
 # map each unique object ID to a TrackableObject
 trackerEngines = {}
-for s in ["person","chair"]:
+for s in ["person","chair", "car"]:
     trackerEngines[s] = TrackerEngine(s,maxDisappeared=40, maxDistance=50)
 
 # initialize the total number of frames processed thus far, along
@@ -121,8 +121,8 @@ while True:
 
 
     # linha #line
-    point_a = (W // 2, 0)
-    point_b = (W // 2, H)
+    point_a = (0, H // 2)
+    point_b = (400, H // 2)
 
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 

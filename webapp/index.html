@@ -25,34 +25,22 @@
 
                     <ul style="width: 100%;display: grid;padding: 1rem;grid-gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
 
-                        <div v-if="!max.ignore" :key="maxValues" v-for="max in maxValues" style="display: contents;">
-                            <li :key="currentValues" v-for="item in currentValues" v-if="max.label == item.label" style="display: block; border: solid 2px white; padding: 1em; border-radius: 30px;">
+                        <div v-if="!max.ignore" :key="maxValues" v-for="max in maxValues" style="display: contents">
+                            <li  v-if="item.label == max.label" v-for="item in currentValues" style="display: block; border: solid 2px white; padding: 1em; border-radius: 30px;">
                                 <h1 style="font-size: 64px !important; color:white"> {{ max["label"] }} </h1>
-                                <h2 style="font-size: 32px !important; color:white"> Entrou: {{ item["enter"] }} </h2>
-                                <h2 style="font-size: 32px !important; color:white"> Saiu: {{ item["exit"] }} </h2>
-                                <h2 style="font-size: 32px !important; color:white"> Dentro: {{ item["enter"] - item["exit"] }} </h2>
-
+                                    <h2 style="font-size: 32px !important; color:white"> Entrou: {{ item["enter"] }} </h2>
+                                    <h2 style="font-size: 32px !important; color:white"> Saiu: {{ item["exit"] }} </h2>
+                                    <h2 style="font-size: 32px !important; color:white"> Dentro: {{ item["enter"] - item["exit"] }} </h2>
+                                    <button  type="submit" v-on:click="resetValue(item.label)" class="btn btn-outline-danger" style="transition: color 0s;">Reset</button>-
                             </li>
-
-
                         </div>
-
-<!--                        <li v-if="max.ignore" style="display: block; border: solid 2px white; padding: 1em; border-radius: 30px;">-->
-<!--                            <h1 style="font-size: 64px !important; color:white"> {{ max["label"] }} </h1>-->
-<!--                            <div :key="currentValues" v-for="item in currentValues">-->
-<!--                            <button  type="submit" v-on:click="resetValue(item.label)" class="btn btn-outline-danger">Reset</button>-->
-<!--                            </div>-->
-
-<!--                            <div v-else :key="maxValues">-->
-<!--                            <input v-model="item['maxValue']" type="text" :placeholder="'Change' + item['label']"/>-->
-<!--                            </div>-->
-<!--                        </li>-->
                     </ul>
+                    <a href="/config" class="btn btn-outline-warning" style="transition: color 0s;">Config</a>
               </div>`,
         data: {
             currentValues: [],
             maxValues: [],
-            config: false
+            config: "chair"
         },
         methods: { // PLANO > alterar dados individuais para o json, substituir o display por um for com os dados
             getDados:function(){

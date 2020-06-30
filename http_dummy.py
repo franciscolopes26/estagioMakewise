@@ -148,9 +148,13 @@ def config():
 
 @http_dummy_server.route('/reset', methods=['POST'])
 def reset():
+    global valueList
+    req_data = request.get_json()
 
-    TOTAL_EXIT = 0
-    TOTAL_ENTER = 0
+    for item in valueList:
+        if req_data["label"] == item["label"]:
+            item["enter"] = 0
+            item["exit"] = 0
 
     data = {'msg': 'RESET has been executed'}
     response = http_dummy_server.response_class(
@@ -158,9 +162,11 @@ def reset():
         response=json.dumps(data),
         mimetype='application/json'
     )
+
+    save_data()
+
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
-
 
 @http_dummy_server.route('/change', methods=['POST'])
 def change():
@@ -181,14 +187,45 @@ def change():
         response=json.dumps(data),
         mimetype='application/json'
     )
+
+    save_data()
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@http_dummy_server.route('/toggle', methods=['POST'])
+def toggle():
+
+    global configList
+
+    req_data = request.get_json()
+    label = str(req_data["label"])
+    ignore = not bool(req_data["ignore"])
+
+    for c in configList:
+        if label == c["label"]:
+            c["ignore"] = ignore
+
+    with open('config.json', 'w') as f:
+        json.dump(configList, f)
+    data = {'msg': 'TOGGLE has been executed'}
+    response = http_dummy_server.response_class(
+        status=200,
+        response=json.dumps(data),
+        mimetype='application/json'
+    )
+
+    save_data()
+
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 
+
 @http_dummy_server.route('/maxvalues', methods=['GET'])
 def getMaxValues():
-
     global configList
+
     response = http_dummy_server.response_class(
              status=200,
              response=json.dumps(configList),
