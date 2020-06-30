@@ -18,13 +18,13 @@ TOTAL_ENTER = 0
 MAX_PEOPLE = 0
 
 valueList = []
-config = []
+config_values = []
 
 try:
     with open('output.json', 'r') as f:
         valueList = json.load(f)
     with open('config.json', 'r') as f:
-        config = json.load(f)
+        config_values = json.load(f)
 except Exception as ex:
     LOG_APP.info('output.json not found')
 
@@ -153,16 +153,16 @@ def reset():
 @http_dummy_server.route('/change', methods=['POST'])
 def change():
 
-    global config
+    global config_values
     req_data = request.get_json()
     label = str(req_data["label"])
     value = int(req_data["maxValue"])
-    for c in config:
+    for c in config_values:
         if label== c["label"]:
             c["maxValue"] = value
 
     with open('config.json', 'w') as f:
-        json.dump(config, f)
+        json.dump(config_values, f)
     data = {'msg': 'RESET has been executed'}
     response = http_dummy_server.response_class(
         status=200,
@@ -176,11 +176,11 @@ def change():
 @http_dummy_server.route('/maxvalues', methods=['GET'])
 def getMaxValues():
 
-    global config
-
+    global config_values
+    print(config_values)
     response = http_dummy_server.response_class(
              status=200,
-             response=config,
+             response=json.dumps(config_values),
              mimetype='application/json'
     )
     return response
