@@ -12,31 +12,38 @@ logging.getLogger().setLevel(logging.INFO)
 
 # Global variables to store info
 
-LABEL = None
-TOTAL_EXIT = 0
-TOTAL_ENTER = 0
-MAX_PEOPLE = 0
-
 valueList = []
-config_values = []
+configList = []
 
 try:
     with open('output.json', 'r') as f:
         valueList = json.load(f)
     with open('config.json', 'r') as f:
-        config_values = json.load(f)
+        configList = json.load(f)
 except Exception as ex:
     LOG_APP.info('output.json not found')
+
+try:
+    for itemA in valueList:
+        found = False
+        for itemB in configList:
+            if itemA["label"] == itemB["label"]:
+                found = True
+        if not found:
+            configList.append({"label": itemA["label"], "maxValue": 25, "ignore": False})
+except:
+    print("bugfixing101")
+print(configList)
 
 LOG_APP.info('History: %s' % str(valueList))
 
 
-def what_color():
-    if (TOTAL_ENTER - TOTAL_EXIT) >= MAX_PEOPLE:
+def what_color(inside, max_people):
+    if inside >= max_people:
         return "red"
-    if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE * 3 / 4):  # 75%
+    if inside > (max_people * 3 / 4):  # 75%
         return "orange"
-    if (TOTAL_ENTER - TOTAL_EXIT) > (MAX_PEOPLE / 2):  # 50%
+    if inside > (max_people / 2):  # 50%
         return "yellow"
     return "white"
 
@@ -75,6 +82,7 @@ def counting_post(sensor_id):
     global valueList
     LOG_APP.info('New counting received for device %s' % str(sensor_id))
     req_data = request.values
+
     found = False
     for item in valueList:
         if req_data["label"] == item["label"]:
@@ -85,7 +93,9 @@ def counting_post(sensor_id):
     if not found:
         LOG_APP.info('Label %s does not exist! appending new value...' % str(req_data["label"]))
         valueList.append(req_data)
+
     save_data()
+
     response = http_dummy_server.response_class(
         response=json.dumps(valueList),
         status=200,
@@ -100,13 +110,15 @@ def save_data():
     try:
         with open('output.json', 'w') as f:  # PLANO > append da informação
             json.dump(valueList, f)
+        with open('config.json', 'w') as f:  # PLANO > append da informação
+            json.dump(configList, f)
     except Exception as ex:
         LOG_APP.exception("Error saving history file", ex)
     try:
         with open('output.json', 'r') as f:
             valueList = json.load(f)
     except:
-        print("bufixing")
+        print("bufixing") # print will never trigger
 
 # Return current counting
 @http_dummy_server.route('/counting', methods=['GET'])
@@ -153,16 +165,16 @@ def reset():
 @http_dummy_server.route('/change', methods=['POST'])
 def change():
 
-    global config_values
+    global configList
     req_data = request.get_json()
     label = str(req_data["label"])
     value = int(req_data["maxValue"])
-    for c in config_values:
-        if label== c["label"]:
+    for c in configList:
+        if label == c["label"]:
             c["maxValue"] = value
 
     with open('config.json', 'w') as f:
-        json.dump(config_values, f)
+        json.dump(configList, f)
     data = {'msg': 'RESET has been executed'}
     response = http_dummy_server.response_class(
         status=200,
@@ -176,11 +188,10 @@ def change():
 @http_dummy_server.route('/maxvalues', methods=['GET'])
 def getMaxValues():
 
-    global config_values
-    print(config_values)
+    global configList
     response = http_dummy_server.response_class(
              status=200,
-             response=json.dumps(config_values),
+             response=json.dumps(configList),
              mimetype='application/json'
     )
     return response

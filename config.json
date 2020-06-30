@@ -1,1 +1,1 @@
-[{"label": "person", "maxValue": 34}, {"label": "car", "maxValue": 25}]
+[{"label": "person", "maxValue": 34, "ignore": true}, {"label": "car", "maxValue": 25, "ignore": false}]
